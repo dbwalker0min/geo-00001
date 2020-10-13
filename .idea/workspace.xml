@@ -15,21 +15,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Core/Inc/compass.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Core/Inc/i2c.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Core/Src/compass.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Core/Src/i2c.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mxproject" beforeDir="false" afterPath="$PROJECT_DIR$/.mxproject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/main.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/motor.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/motor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/sensor.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/sensor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/stm32l4xx_it.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/stm32l4xx_it.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/main.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/motor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/motor.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Src/sensor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/sensor.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Src/stm32l4xx_hal_msp.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/stm32l4xx_hal_msp.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/geo-00001.ioc" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.ioc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +103,7 @@
       <updated>1602201524002</updated>
       <workItem from="1602201539024" duration="781000" />
       <workItem from="1602202743595" duration="5470000" />
-      <workItem from="1602263669903" duration="54246000" />
+      <workItem from="1602263669903" duration="58675000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>
@@ -131,7 +119,14 @@
       <option name="project" value="LOCAL" />
       <updated>1602365469386</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="ADC and I2C working">
+      <created>1602551340927</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1602551340927</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -139,17 +134,18 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ADC coming along..." />
-    <option name="LAST_COMMIT_MESSAGE" value="ADC coming along..." />
+    <MESSAGE value="ADC and I2C working" />
+    <option name="LAST_COMMIT_MESSAGE" value="ADC and I2C working" />
   </component>
   <component name="WindowStateProjectService">
     <state x="4145" y="322" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1602266719275">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4145" y="322" key="#com.intellij.fileTypes.FileTypeChooser/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602266719275" />
-    <state x="4025" y="88" key="CommitChangelistDialog2" timestamp="1602365468556">
+    <state x="4025" y="88" key="CommitChangelistDialog2" timestamp="1602551338205">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4025" y="88" key="CommitChangelistDialog2/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602365468556" />
+    <state x="4025" y="88" key="CommitChangelistDialog2/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602551338205" />
     <state x="3611" y="167" key="SettingsEditor" timestamp="1602265278527">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
