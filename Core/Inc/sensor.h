@@ -10,4 +10,6 @@
 void sensor_isr();
 void init_sensor();
 
+unsigned duty_cycle(unsigned voltage_mv);
+
 #endif //GEO_00001_SENSOR_H

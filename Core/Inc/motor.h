@@ -4,6 +4,9 @@
 
 #ifndef GEO_00001_MOTOR_H
 #define GEO_00001_MOTOR_H
+
+void init_motor();
+
 void motor_isr();
 
 #endif //GEO_00001_MOTOR_H
