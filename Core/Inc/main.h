@@ -76,10 +76,6 @@ void Error_Handler(void);
 #define POT_GPIO_Port GPIOA
 #define VIN_Pin GPIO_PIN_1
 #define VIN_GPIO_Port GPIOA
-#define IMOT_Pin GPIO_PIN_2
-#define IMOT_GPIO_Port GPIOA
-#define VREF_Pin GPIO_PIN_3
-#define VREF_GPIO_Port GPIOA
 #define MOT_L_POS_Pin GPIO_PIN_7
 #define MOT_L_POS_GPIO_Port GPIOA
 #define MOT_L_NEG_Pin GPIO_PIN_0

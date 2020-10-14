@@ -23,7 +23,6 @@
 #include "stm32l4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sensor.h"
 #include "motor.h"
 #include "i2c.h"
 /* USER CODE END Includes */
@@ -175,7 +174,7 @@ void ADC1_2_IRQHandler(void)
   unsigned irq_status = ADC12_COMMON->CSR;
 
   if (irq_status & ADC_CSR_EOS_MST) {
-    sensor_isr();
+    motor_isr();
     ADC1->ISR = ADC_ISR_EOS;
   }
 
@@ -186,9 +185,9 @@ void ADC1_2_IRQHandler(void)
    * PWM and is measured every 100us
    */
 
-  if (irq_status & ADC_CSR_EOS_SLV) {
+  if (irq_status & ADC_CSR_EOS_MST) {
     motor_isr();
-    ADC2->ISR = ADC_ISR_EOS;
+    ADC1->ISR = ADC_ISR_EOS;
   }
 
   /* USER CODE END ADC1_2_IRQn 1 */
