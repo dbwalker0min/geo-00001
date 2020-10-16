@@ -40,6 +40,7 @@ add_definitions(${defines})
 file(GLOB_RECURSE SOURCES ${sources})
 
 include_directories(Middlewares/Segger_RTT/RTT)
+include_directories(Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI)
 include_directories(${includes})
 
 add_executable($${PROJECT_NAME}.elf $${SOURCES} $${LINKER_SCRIPT})

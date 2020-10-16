@@ -1,3 +1,4 @@
+#include <sched.h>
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -27,6 +28,8 @@
 #include "compass.h"
 #include "motor.h"
 #include <i2c.h>
+#include "usb_io.h"
+#include <SEGGER_RTT.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,7 +72,8 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
-void StartInitialTask(void *argument);
+
+_Noreturn void StartInitialTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -77,6 +81,7 @@ void StartInitialTask(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 
 /* USER CODE END 0 */
 
@@ -552,6 +557,8 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+static uint8_t line[128];
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartInitialTask */
@@ -561,20 +568,42 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartInitialTask */
-void StartInitialTask(void *argument)
+_Noreturn void StartInitialTask(void *argument)
 {
+  unsigned caret = 0;   // the line position
+
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
 
   i2c_init();
-  init_compass();
-  init_motor();
+//  init_compass();
+//  init_motor();
 
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    for (unsigned eol=0; !eol; ) {
+      char ch = get_usb_char();
+      switch (ch) {
+      case '\b':
+        if (caret) {
+          caret--;
+          print_usb_string("\b \b");
+        }
+        break;
+      case '\r':
+        line[caret++] = '\0';
+        eol = 1;
+      default:
+        put_usb_char(ch);
+        if (caret != 126)
+          line[caret++] = ch;
+      }
+    }
+    SEGGER_RTT_WriteString(0, "\nReceived: ");
+    SEGGER_RTT_WriteString(0, line);
+    SEGGER_RTT_Write(0, "\n", 1);
   }
   /* USER CODE END 5 */
 }
