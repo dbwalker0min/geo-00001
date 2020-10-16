@@ -62,6 +62,11 @@ void motor_isr()
 
   // disable and calibrate the ADC after the conversion
   LL_ADC_Disable(ADC_MOTOR);
+  while(LL_ADC_IsDisableOngoing(ADC_MOTOR));
+
+  LL_ADC_REG_StopConversion(ADC_MOTOR);
+  while(LL_ADC_REG_IsStopConversionOngoing(ADC_MOTOR));
+
   LL_ADC_StartCalibration(ADC_MOTOR, LL_ADC_SINGLE_ENDED);
 
   // should do stuff here while the calibration is occurring

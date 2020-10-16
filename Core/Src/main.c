@@ -1,4 +1,3 @@
-#include <sched.h>
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -30,6 +29,7 @@
 #include <i2c.h>
 #include "usb_io.h"
 #include <SEGGER_RTT.h>
+#include "FreeRTOS_CLI.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,7 +51,7 @@ typedef StaticTask_t osStaticThreadDef_t;
 
 /* Definitions for initial */
 osThreadId_t initialHandle;
-uint32_t initialBuffer[ 128 ];
+uint32_t initialBuffer[ 200 ];
 osStaticThreadDef_t initialControlBlock;
 const osThreadAttr_t initial_attributes = {
   .name = "initial",
@@ -72,8 +72,7 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_TIM1_Init(void);
-
-_Noreturn void StartInitialTask(void *argument);
+void StartInitialTask(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -82,6 +81,17 @@ _Noreturn void StartInitialTask(void *argument);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+BaseType_t hello_command(char *wbuf, size_t buf_len, const char *cmd) {
+  strncpy(wbuf, "Hello USB!\n", buf_len);
+  return pdFALSE;
+}
+
+CLI_Command_Definition_t hello_cmd_def = {
+    .pcCommand = "hello",
+    .pxCommandInterpreter = &hello_command,
+    .cExpectedNumberOfParameters = 0,
+    .pcHelpString = "A simple command to test the interface"
+};
 
 /* USER CODE END 0 */
 
@@ -266,7 +276,7 @@ static void MX_ADC1_Init(void)
   LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MDATAALIGN_HALFWORD);
 
   /* ADC1 interrupt Init */
-  NVIC_SetPriority(ADC1_2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),5, 0));
+  NVIC_SetPriority(ADC1_2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),4, 0));
   NVIC_EnableIRQ(ADC1_2_IRQn);
 
   /* USER CODE BEGIN ADC1_Init 1 */
@@ -558,7 +568,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 static uint8_t line[128];
-
+static uint8_t response[256];
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartInitialTask */
@@ -568,21 +578,22 @@ static uint8_t line[128];
   * @retval None
   */
 /* USER CODE END Header_StartInitialTask */
-_Noreturn void StartInitialTask(void *argument)
+void StartInitialTask(void *argument)
 {
-  unsigned caret = 0;   // the line position
-
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
 
   i2c_init();
-//  init_compass();
-//  init_motor();
+  init_compass();
+  init_motor();
+
+  FreeRTOS_CLIRegisterCommand(&hello_cmd_def);
 
   /* Infinite loop */
   for(;;)
   {
+    unsigned caret = 0;
     for (unsigned eol=0; !eol; ) {
       char ch = get_usb_char();
       switch (ch) {
@@ -593,17 +604,30 @@ _Noreturn void StartInitialTask(void *argument)
         }
         break;
       case '\r':
+      case '\n':
         line[caret++] = '\0';
+        write_usb("\r\n", 2);
         eol = 1;
+        caret = 0;
+        break;
       default:
         put_usb_char(ch);
         if (caret != 126)
           line[caret++] = ch;
       }
     }
-    SEGGER_RTT_WriteString(0, "\nReceived: ");
-    SEGGER_RTT_WriteString(0, line);
-    SEGGER_RTT_Write(0, "\n", 1);
+    if (line[0] != '\0') {
+      portBASE_TYPE ret;
+      do {
+        ret = FreeRTOS_CLIProcessCommand(line, response, sizeof(response));
+        print_usb_string(response);
+      } while(ret);
+      SEGGER_RTT_WriteString(0, "\nReceived: ");
+      SEGGER_RTT_WriteString(0, line);
+      SEGGER_RTT_Write(0, "\n", 1);
+    }
+    print_usb_string("\r\n> ");
+
   }
   /* USER CODE END 5 */
 }

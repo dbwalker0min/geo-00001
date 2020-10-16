@@ -313,7 +313,6 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 {
   uint8_t result = USBD_OK;
-
   /* USER CODE BEGIN 13 */
   unsigned tx_len;
   Buf = tx_outptr;

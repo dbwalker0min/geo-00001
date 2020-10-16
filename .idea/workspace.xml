@@ -15,17 +15,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Core/Inc/usb_io.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI/FreeRTOS_CLI.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI/FreeRTOS_CLI.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI/LICENSE_INFORMATION.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists_template.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists_template.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/motor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/motor.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/STM32L412KBTx_FLASH.ld" beforeDir="false" afterPath="$PROJECT_DIR$/STM32L412KBTx_FLASH.ld" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug.user" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/USB_DEVICE/Target/usbd_conf.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/Target/usbd_conf.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.ioc" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.ioc" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +108,7 @@
       <updated>1602201524002</updated>
       <workItem from="1602201539024" duration="781000" />
       <workItem from="1602202743595" duration="5470000" />
-      <workItem from="1602263669903" duration="95727000" />
+      <workItem from="1602263669903" duration="102739000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>

@@ -185,11 +185,6 @@ void ADC1_2_IRQHandler(void)
    * PWM and is measured every 100us
    */
 
-  if (irq_status & ADC_CSR_EOS_MST) {
-    motor_isr();
-    ADC1->ISR = ADC_ISR_EOS;
-  }
-
   /* USER CODE END ADC1_2_IRQn 1 */
 }
 
