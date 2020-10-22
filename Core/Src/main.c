@@ -30,6 +30,7 @@
 #include "usb_io.h"
 #include <SEGGER_RTT.h>
 #include "FreeRTOS_CLI.h"
+#include "led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,7 +91,7 @@ CLI_Command_Definition_t hello_cmd_def = {
     .pcCommand = "hello",
     .pxCommandInterpreter = &hello_command,
     .cExpectedNumberOfParameters = 0,
-    .pcHelpString = "A simple command to test the interface"
+    .pcHelpString = "hello:\r\n A simple command to test the interface\r\n\r\n"
 };
 
 /* USER CODE END 0 */
@@ -456,6 +457,7 @@ static void MX_TIM1_Init(void)
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_TOGGLE;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
+  TIM_OC_InitStruct.CompareValue = 800;
   TIM_OC_InitStruct.OCNIdleState = LL_TIM_OCIDLESTATE_LOW;
   LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH3, &TIM_OC_InitStruct);
   LL_TIM_OC_DisableFast(TIM1, LL_TIM_CHANNEL_CH3);
@@ -534,6 +536,9 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GRN_Pin|RED_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOH, GPIO_PIN_3, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PC14 PC15 */
@@ -550,8 +555,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB1 PB4 PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5;
+  /*Configure GPIO pins : GRN_Pin RED_Pin */
+  GPIO_InitStruct.Pin = GRN_Pin|RED_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PB5 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -568,6 +580,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 static uint8_t line[128];
+static uint8_t last_line[128];
 static uint8_t response[256];
 /* USER CODE END 4 */
 
@@ -577,6 +590,7 @@ static uint8_t response[256];
   * @param  argument: Not used
   * @retval None
   */
+_Noreturn
 /* USER CODE END Header_StartInitialTask */
 void StartInitialTask(void *argument)
 {
@@ -587,6 +601,7 @@ void StartInitialTask(void *argument)
   i2c_init();
   init_compass();
   init_motor();
+  init_led();
 
   FreeRTOS_CLIRegisterCommand(&hello_cmd_def);
 
@@ -597,6 +612,11 @@ void StartInitialTask(void *argument)
     for (unsigned eol=0; !eol; ) {
       char ch = get_usb_char();
       switch (ch) {
+      case 1: // ctrl-a repeats the last command
+        strncpy(line, last_line, sizeof(line));
+        eol = 1;
+        caret = 0;
+        break;
       case '\b':
         if (caret) {
           caret--;
@@ -606,6 +626,7 @@ void StartInitialTask(void *argument)
       case '\r':
       case '\n':
         line[caret++] = '\0';
+        strncpy(last_line, line, sizeof(line));
         write_usb("\r\n", 2);
         eol = 1;
         caret = 0;

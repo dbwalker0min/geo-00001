@@ -80,10 +80,14 @@ void Error_Handler(void);
 #define MOT_L_POS_GPIO_Port GPIOA
 #define MOT_L_NEG_Pin GPIO_PIN_0
 #define MOT_L_NEG_GPIO_Port GPIOB
+#define GRN_Pin GPIO_PIN_1
+#define GRN_GPIO_Port GPIOB
 #define MOT_H_POS_Pin GPIO_PIN_8
 #define MOT_H_POS_GPIO_Port GPIOA
 #define MOT_H_NEG_Pin GPIO_PIN_9
 #define MOT_H_NEG_GPIO_Port GPIOA
+#define RED_Pin GPIO_PIN_4
+#define RED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

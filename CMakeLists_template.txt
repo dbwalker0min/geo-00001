@@ -36,14 +36,15 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_definitions(-DARM_MATH_CM4 -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING -D__FPU_PRESENT=1)
 add_definitions(${defines})
-
 file(GLOB_RECURSE SOURCES ${sources})
 
 include_directories(Middlewares/Segger_RTT/RTT)
 include_directories(Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI)
 include_directories(${includes})
+link_directories(Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib)
 
 add_executable($${PROJECT_NAME}.elf $${SOURCES} $${LINKER_SCRIPT})
+target_link_libraries($${PROJECT_NAME}.elf libarm_cortexM4lf_math.a)
 
 set(CMAKE_EXE_LINKER_FLAGS
     "$${CMAKE_EXE_LINKER_FLAGS} -Wl,-Map=$${PROJECT_BINARY_DIR}/$${PROJECT_NAME}.map")

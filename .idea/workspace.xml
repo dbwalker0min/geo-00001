@@ -15,15 +15,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Core/Inc/led.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Core/Src/led.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib/libarm_cortexM4l_math.a" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib/libarm_cortexM4lf_math.a" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.cproject" beforeDir="false" afterPath="$PROJECT_DIR$/.cproject" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mxproject" beforeDir="false" afterPath="$PROJECT_DIR$/.mxproject" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists_template.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists_template.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/main.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/main.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/main.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/motor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/motor.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/stm32l4xx_it.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/STM32L412KBTx_FLASH.ld" beforeDir="false" afterPath="$PROJECT_DIR$/STM32L412KBTx_FLASH.ld" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/USB_DEVICE/Target/usbd_conf.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/Target/usbd_conf.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/geo-00001.ioc" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.ioc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug.user" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug.user" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +55,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -62,11 +68,12 @@
     <property name="settings.editor.selected.configurable" value="configurable.group.build" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Documents\Firmware\geo-00001\Middlewares\Third_Party\ARM_CMSIS\CMSIS\DSP\Lib" />
+      <recent name="D:\Documents\Firmware\geo-00001" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Documents\Firmware\geo-00001\Core\Inc" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Documents\Firmware\geo-00001" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -74,26 +81,12 @@
       <command value="USBD_STATE_CONFIGURED" />
     </option>
   </component>
-  <component name="RunManager" selected="OpenOCD Download &amp; Run.OCD geo-00001">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="geo-00001.elf" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="geo-00001" TARGET_NAME="geo-00001.elf" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="geo-00001" RUN_TARGET_NAME="geo-00001.elf">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager">
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="CMake Application.geo-00001.elf" />
-      <item itemvalue="OpenOCD Download &amp; Run.OCD geo-00001" />
-    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -108,7 +101,11 @@
       <updated>1602201524002</updated>
       <workItem from="1602201539024" duration="781000" />
       <workItem from="1602202743595" duration="5470000" />
-      <workItem from="1602263669903" duration="102739000" />
+      <workItem from="1602263669903" duration="112574000" />
+      <workItem from="1602944084038" duration="523000" />
+      <workItem from="1602945436068" duration="14819000" />
+      <workItem from="1603058080978" duration="3347000" />
+      <workItem from="1603382632489" duration="1506000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>
@@ -167,10 +164,10 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="3611" y="167" key="SettingsEditor/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602265278527" />
-    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1602797655515">
+    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1602881437549">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602797655515" />
+    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602881437549" />
     <state x="4056" y="240" key="run.anything.popup" timestamp="1602206263964">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
