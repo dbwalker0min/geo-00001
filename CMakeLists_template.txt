@@ -40,6 +40,7 @@ file(GLOB_RECURSE SOURCES ${sources})
 
 include_directories(Middlewares/Segger_RTT/RTT)
 include_directories(Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI)
+include_directories(Middlewares/printf)
 include_directories(${includes})
 link_directories(Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib)
 

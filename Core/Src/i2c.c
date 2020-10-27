@@ -37,12 +37,12 @@ osEventFlagsId_t i2c_ready;
 
 int i2c_wwr(
     uint8_t addr,
-    void *wbuf1, uint8_t wlen1,
-    void *wbuf2, uint8_t wlen2,
+    const void *wbuf1, uint8_t wlen1,
+    const void *wbuf2, uint8_t wlen2,
     void *rbuf,  uint8_t rlen)
 {
-  i2c_transaction.wbuf1 = wbuf1;
-  i2c_transaction.wbuf2 = wbuf2;
+  i2c_transaction.wbuf1 = (void*)wbuf1;
+  i2c_transaction.wbuf2 = (void*)wbuf2;
   i2c_transaction.rbuf = rbuf;
   i2c_transaction.nw1 = wlen1;
   i2c_transaction.nw2 = wlen1;

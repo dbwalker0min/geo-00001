@@ -1,44 +1,58 @@
 
-GraphedExpression="speed", DisplayFormat=DISPLAY_FORMAT_DEC
-OpenDocument="stm32l4xx_ll_usb.c", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_usb.c", Line=2512
-OpenDocument="arm_biquad_cascade_df1_fast_q31.c", FilePath="C:/Users/clamar01/fork3/CMSIS_5/CMSIS/DSP/Source/FilteringFunctions/arm_biquad_cascade_df1_fast_q31.c", Line=0
+Breakpoint=motor.c:254, State=BP_STATE_DISABLED
+Breakpoint=main.c:98, State=BP_STATE_ON
+Breakpoint=compass.c:44:1, State=BP_STATE_DISABLED
+GraphedExpression="filtered_pot_word", DisplayFormat=DISPLAY_FORMAT_DEC
+OpenDocument="calibration_constants.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/calibration_constants.c", Line=116
+OpenDocument="tasks.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/tasks.c", Line=3594
+OpenDocument="main.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/main.c", Line=98
+OpenDocument="event_groups.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/event_groups.c", Line=703
+OpenDocument="stm32l4xx_it.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/stm32l4xx_it.c", Line=185
+OpenDocument="compass.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/compass.c", Line=31
+OpenDocument="stm32l4xx_ll_usb.c", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_ll_usb.c", Line=2517
 OpenDocument="startup_stm32l412xx.s", FilePath="D:/Documents/Firmware/geo-00001/startup/startup_stm32l412xx.s", Line=53
-OpenDocument="motor.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/motor.c", Line=125
-OpenDocument="cmsis_os2.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c", Line=1103
-OpenDocument="stm32l4xx_ll_adc.h", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h", Line=6025
+OpenDocument="motor.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/motor.c", Line=240
+OpenDocument="cmsis_os2.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c", Line=1141
+OpenDocument="stm32l4xx_ll_adc.h", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ll_adc.h", Line=6094
 OpenDocument="stm32l4xx_hal_pcd.c", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_pcd.c", Line=2263
-OpenDocument="geo-00001.jdebug", FilePath="D:/Documents/Firmware/geo-00001/geo-00001.jdebug", Line=0
-OpenDocument="main.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/main.c", Line=94
+OpenDocument="timers.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/timers.c", Line=1016
 OpenDocument="usbd_cdc_if.c", FilePath="D:/Documents/Firmware/geo-00001/USB_DEVICE/App/usbd_cdc_if.c", Line=341
 OpenDocument="stm32l4xx_hal_msp.c", FilePath="D:/Documents/Firmware/geo-00001/Core/Src/stm32l4xx_hal_msp.c", Line=39
 OpenDocument="stm32l4xx_hal.c", FilePath="D:/Documents/Firmware/geo-00001/Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c", Line=176
-OpenDocument="tasks.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Third_Party/FreeRTOS/Source/tasks.c", Line=3362
+OpenDocument="geo-00001.jdebug", FilePath="D:/Documents/Firmware/geo-00001/geo-00001.jdebug", Line=0
 OpenDocument="SEGGER_RTT.c", FilePath="D:/Documents/Firmware/geo-00001/Middlewares/Segger_RTT/RTT/SEGGER_RTT.c", Line=252
 OpenToolbar="Debug", Floating=0, x=0, y=0
-OpenWindow="Call Stack", DockArea=LEFT, x=0, y=0, w=420, h=147, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Registers 1", DockArea=BOTTOM, x=5, y=0, w=559, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
-OpenWindow="Disassembly", DockArea=BOTTOM, x=2, y=0, w=223, h=377, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Break & Tracepoints", DockArea=LEFT, x=0, y=1, w=420, h=245, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VectorCatchIndexMask=254
-OpenWindow="Memory 1", DockArea=BOTTOM, x=4, y=0, w=249, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x20000874
-OpenWindow="Global Data", DockArea=RIGHT, x=0, y=0, w=421, h=326, FilterBarShown=1, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Local Data", DockArea=RIGHT, x=0, y=1, w=421, h=245, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Watched Data 1", DockArea=RIGHT, x=0, y=1, w=421, h=245, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Call Stack", DockArea=LEFT, x=0, y=0, w=420, h=157, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Registers 1", DockArea=BOTTOM, x=5, y=0, w=546, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, FilteredItems=[], RefreshRate=1
+OpenWindow="Disassembly", DockArea=BOTTOM, x=2, y=0, w=218, h=377, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Break & Tracepoints", DockArea=LEFT, x=0, y=1, w=420, h=235, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VectorCatchIndexMask=254
+OpenWindow="Memory 1", DockArea=BOTTOM, x=4, y=0, w=244, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, EditorAddress=0x200008EC
+OpenWindow="Global Data", DockArea=RIGHT, x=0, y=0, w=421, h=321, FilterBarShown=1, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Local Data", DockArea=RIGHT, x=0, y=1, w=421, h=250, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Watched Data 1", DockArea=RIGHT, x=0, y=1, w=421, h=250, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 OpenWindow="Functions", DockArea=LEFT, x=0, y=2, w=420, h=194, FilterBarShown=1, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Terminal", DockArea=BOTTOM, x=3, y=0, w=222, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Data Sampling", DockArea=BOTTOM, x=1, y=0, w=498, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
-OpenWindow="Timeline", DockArea=BOTTOM, x=0, y=0, w=405, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="5 s / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="265;255", PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="248;0", CodeGraphLegendShown=0, CodeGraphLegendPosition="248;0"
-OpenWindow="Console", DockArea=BOTTOM, x=2, y=0, w=223, h=377, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[100;100;100;121]
-TableHeader="Local Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[150;88;152;44;48;122]
-TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[164;104;79;44;48;100]
-TableHeader="Vector Catches", SortCol="None", SortOrder="ASCENDING", VisibleCols=["";"Vector Catch";"Description"], ColWidths=[50;300;500]
-TableHeader="Break & Tracepoints", SortCol="Type", SortOrder="ASCENDING", VisibleCols=["";"Type";"Location";"Extras"], ColWidths=[55;56;182;127]
-TableHeader="Functions", SortCol="Name", SortOrder="DESCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[156;64;44;57;242]
-TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[344;112;104;77;168;100]
-TableHeader="Data Sampling Table", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" speed"], ColWidths=[100;100;100]
-TableHeader="Data Sampling Setup", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[100;100;100;100;100;100;100;100;100]
-TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+OpenWindow="Terminal", DockArea=BOTTOM, x=3, y=0, w=216, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Data Sampling", DockArea=BOTTOM, x=1, y=0, w=486, h=377, FilterBarShown=1, TotalValueBarShown=1, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
+OpenWindow="Timeline", DockArea=BOTTOM, x=0, y=0, w=446, h=393, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=0, CodePaneShown=0, PinCursor="Cursor Movable", TimePerDiv="5 s / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=0, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="218;221", PowerGraphDrawAsPoints=0, PowerGraphLegendShown=0, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="289;0", CodeGraphLegendShown=0, CodeGraphLegendPosition="289;0"
+OpenWindow="Console", DockArea=BOTTOM, x=2, y=0, w=218, h=377, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="FreeRTOS", DockArea=BOTTOM, x=1, y=0, w=486, h=377, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, Showing="Task List"
 TableHeader="Task List", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Name";"Run Count";"Priority";"Status";"Timeout";"Stack Info";"ID";"Mutex Count";"Notified Value";"Notify State"], ColWidths=[110;110;110;110;110;110;110;110;110;110]
-TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[206;116;224]
+TableHeader="Watched Data 1", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Value";"Location";"Refresh"], ColWidths=[100;100;100;104]
+TableHeader="Data Sampling Table", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";" filtered_pot_word"], ColWidths=[100;100;100]
+TableHeader="Data Sampling Setup", SortCol="Expression", SortOrder="ASCENDING", VisibleCols=["Expression";"Type";"Value";"Min";"Max";"Average";"# Changes";"Min. Change";"Max. Change"], ColWidths=[100;100;100;100;100;100;100;100;100]
+TableHeader="Global Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[164;104;79;44;48;272]
+TableHeader="Vector Catches", SortCol="None", SortOrder="ASCENDING", VisibleCols=["";"Vector Catch";"Description"], ColWidths=[50;300;500]
+TableHeader="Break & Tracepoints", SortCol="Type", SortOrder="ASCENDING", VisibleCols=["";"Type";"Location";"Extras"], ColWidths=[55;56;182;230]
+TableHeader="Local Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Scope"], ColWidths=[150;88;152;44;48;100]
+TableHeader="Functions", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Address";"Size";"#Insts";"Source"], ColWidths=[156;64;44;57;242]
+TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[344;112;104;77;168;100]
+TableHeader="Power Sampling", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Ch 0"], ColWidths=[100;100;100]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Description"], ColWidths=[206;116;207]
 TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", VisibleCols=[], ColWidths=[]
 WatchedExpression="adc_buffer", RefreshRate=1, Window=Watched Data 1
+WatchedExpression="compass_data", RefreshRate=1, Window=Watched Data 1
+WatchedExpression="dpin", RefreshRate=1, Window=Watched Data 1
+WatchedExpression="(EventGroupHandle_t)data_ready", Window=Watched Data 1
+WatchedExpression="cal_data", Window=Watched Data 1
+WatchedExpression="cal_data_blk_ptr", Window=Watched Data 1
+WatchedExpression="pot_max", RefreshRate=1, Window=Watched Data 1

@@ -67,6 +67,7 @@
   */
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
+#define SEGGER_TRACE 1
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -100,8 +101,11 @@ uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 /** manage the variable length circular buffer **/
-static uint8_t *volatile rx_inptr, *volatile rx_outptr, *volatile rx_limit;
-static uint8_t *tx_inptr, *tx_outptr, *tx_limit;
+static uint8_t *volatile rx_inptr = UserRxBufferFS;
+static uint8_t *volatile rx_outptr = UserRxBufferFS;
+static uint8_t *volatile rx_limit;
+static uint8_t *tx_inptr = UserTxBufferFS;
+static uint8_t *tx_outptr = UserTxBufferFS;
 volatile bool host_port_open;
 
 USBD_CDC_LineCodingTypeDef line_coding = {
@@ -110,8 +114,6 @@ USBD_CDC_LineCodingTypeDef line_coding = {
     .format = 0,
     .paritytype = 0,
 };
-
-osEventFlagsId_t usb_events;
 
 /* USER CODE END PRIVATE_VARIABLES */
 
@@ -170,12 +172,12 @@ USBD_CDC_ItfTypeDef USBD_Interface_fops_FS =
 static int8_t CDC_Init_FS(void)
 {
   /* USER CODE BEGIN 3 */
-  SEGGER_RTT_WriteString(0, "Initialize CDC\n");
+#ifdef SEGGER_TRACE
+    SEGGER_RTT_WriteString(0, "Initialize CDC\n");
+#endif
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
-  rx_inptr = rx_outptr = UserRxBufferFS;
-  tx_inptr = tx_outptr = UserTxBufferFS;
 
   return (USBD_OK);
   /* USER CODE END 3 */
@@ -202,22 +204,25 @@ static int8_t CDC_DeInit_FS(void)
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 5 */
+#ifdef SEGGER_TRACE
+  SEGGER_RTT_WriteString(0, "Control FS\n");
+#endif
 
   switch (cmd) {
 
   case CDC_GET_LINE_CODING:
-    SEGGER_RTT_WriteString(0, "Get line coding\n");
+    // SEGGER_RTT_WriteString(0, "Get line coding\n");
     memcpy(pbuf, &line_coding, sizeof(line_coding));
     break;
 
   case CDC_SET_LINE_CODING:
-    SEGGER_RTT_WriteString(0, "Set line coding\n");
+    // SEGGER_RTT_WriteString(0, "Set line coding\n");
     break;
 
   case CDC_SET_CONTROL_LINE_STATE: {
     USBD_SetupReqTypedef *req = (USBD_SetupReqTypedef *) pbuf;
 
-    SEGGER_RTT_printf(0, "Set line state %d\n", req->wValue);
+    // SEGGER_RTT_printf(0, "Set line state %d\n", req->wValue);
     host_port_open = req->wValue & 1;
   }
     break;
@@ -229,7 +234,7 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   case CDC_GET_COMM_FEATURE:
   case CDC_CLEAR_COMM_FEATURE:
   default:
-    SEGGER_RTT_printf(0, "Unhandled control request %d\n", cmd);
+    // SEGGER_RTT_printf(0, "Unhandled control request %d\n", cmd);
     break;
   }
 
@@ -255,18 +260,19 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+#ifdef SEGGER_TRACE
+  SEGGER_RTT_WriteString(0, "Receive FS\n");
+#endif
 
   // add this to the buffer by specifying the new start address
   rx_inptr += *Len;
 
-  // TODO: check for buffer overflow.
+  // TODO: check for buffer overflow and stop filling if overflown
   // if the buffer doesn't have enough space for a complete packet, mark the end
   if (rx_inptr - UserRxBufferFS + CDC_DATA_FS_OUT_PACKET_SIZE > APP_RX_DATA_SIZE) {
     rx_limit = rx_inptr;
     rx_inptr = UserRxBufferFS;
   }
-  osEventFlagsSet(usb_events, 1);
-
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, rx_inptr);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
@@ -288,6 +294,10 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
+#ifdef SEGGER_TRACE
+  SEGGER_RTT_WriteString(0, "Transmit FS\n");
+#endif
+
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
   if (hcdc->TxState != 0){
     return USBD_BUSY;
@@ -317,6 +327,12 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
   unsigned tx_len;
   Buf = tx_outptr;
 
+#ifdef SEGGER_TRACE
+  SEGGER_RTT_WriteString(0, "TransmitCplt FS\n");
+#endif
+  if (tx_inptr == tx_outptr)
+    return result;
+  
   if (tx_outptr > tx_inptr) {
     // send the last part of the buffer
     tx_len = APP_TX_DATA_SIZE - (tx_outptr - UserTxBufferFS);
@@ -336,21 +352,14 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
-static const osEventFlagsAttr_t usb_event_attributes = {
-    .name = "USB",
-};
-
-
 void   init_usb_io() {
-  usb_events = osEventFlagsNew(&usb_event_attributes);
 }
 
 char get_usb_char() {
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
 
-  while (!host_port_open || rx_inptr == rx_outptr) {
-    osEventFlagsWait(usb_events, 1, osFlagsWaitAny, osWaitForever);
-    osEventFlagsClear(usb_events, 1);
+  while (rx_inptr == rx_outptr) {
+    osDelay(1);
   }
 
   // pull a character out of the buffer
@@ -360,12 +369,14 @@ char get_usb_char() {
   return ch;
 }
 
-void write_usb(void *buf, unsigned buf_len) {
+void write_usb(const void *buf, unsigned buf_len) {
   // copy the buffer to to the circular buffer
+  int state =osKernelLock();
+
   if (tx_inptr + buf_len - UserTxBufferFS > APP_TX_DATA_SIZE) {
     // the new buffer spans the circular buffer so
     // copy in two stages
-    unsigned len1 = tx_inptr - UserTxBufferFS;
+    unsigned len1 = APP_TX_DATA_SIZE - (tx_inptr - UserTxBufferFS);
     unsigned len2 = buf_len - len1;
 
     memcpy(tx_inptr, buf, len1);
@@ -377,12 +388,12 @@ void write_usb(void *buf, unsigned buf_len) {
   }
 
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-  if (hcdc->TxState != 0){
-    return ;
-  }
-  // start sending data by pretending that the last transmission was complete
-  CDC_TransmitCplt_FS(0, 0, 0);
+  if (hcdc->TxState == 0) {
 
+    // start sending data by pretending that the last transmission was complete
+    CDC_TransmitCplt_FS(0, 0, 0);
+  }
+  osKernelRestoreLock(state);
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */

@@ -13,17 +13,34 @@
 #include "stm32l4xx_ll_tim.h"
 #include "SEGGER_RTT.h"
 #include "arm_math.h"
+#include "usb_io.h"
+#include "calibration_constants.h"
+
 
 #define ADC_MOTOR ADC1
 #define DMA_ADC_MOTOR DMA1
 #define DMA_CHANNEL_ADC_MOTOR LL_DMA_CHANNEL_1
 #define F_Q31(f) (q31_t)(f*2147483648)
 static struct {
-  uint16_t imot;
-  uint16_t vin;
-  uint16_t pot;
   uint16_t vref;
+  uint16_t pot;
+  uint16_t vin;
 } adc_buffer;
+
+static uint16_t pot_max;
+static uint16_t pot_1_turn;
+static uint16_t pot_zero;
+
+static arm_pid_instance_q31 motor_pid;
+static unsigned pot_setpoint;
+static int deadband_pot = 2;
+
+static q31_t filtered_pot;
+static int16_t filtered_pot_word;
+static q31_t filtered_pot2;
+static int speed;
+
+bool nudge_setpoint(unsigned int pot);
 
 static enum {
   MOTOR_OFF,
@@ -33,6 +50,11 @@ static enum {
 
 static int voltage;
 static unsigned time;
+
+static inline int iabs(int x)
+{
+  return x < 0 ? -x : x;
+}
 
 // this is half of a 100 element Nuttall filter
 static const uint32_t coeffs[] = {
@@ -45,6 +67,7 @@ static const uint32_t coeffs[] = {
 
 // minimum input voltage in mV
 static float vin_min = 12.0f;
+static bool unlocked = false;
 
 #define VREFINT (*VREFINT_CAL_ADDR)
 #define CRLF "\r\n"
@@ -72,8 +95,6 @@ static const arm_biquad_casd_df1_inst_q31 pot_filter = {
     .postShift = 1,
 };
 
-static arm_pid_instance_q31 motor_pid;
-static unsigned pot_setpoint;
 
 // A command to turn on the motor at a constant voltage for a time
 BaseType_t command_vmot(char *wbuf, size_t buf_len, const char*cmd) {
@@ -99,17 +120,174 @@ CLI_Command_Definition_t cmd_vmot_def = {
     .cExpectedNumberOfParameters = 2,
 };
 
+static const char nudge_prompt[] =
+    "Motor nudge mode" CRLF
+    "a = CCW ~1deg s = CW ~1deg" CRLF
+    "A = CCW ~5deg S = CW ~5deg" CRLF
+    "< = CCW ~90deg > = CW ~90deg" CRLF
+    "u - unlock max CCW rotation limit (dangerous!)" CRLF
+    "l - set CCW rotation limit" CRLF
+    "L - go to CCW rotation limit" CRLF
+    "t - set 360deg from limit" CRLF
+    "T - go to 360deg from limit" CRLF
+    "z - set zero position" CRLF
+    "Z - go to zero position" CRLF
+    "? - print calibration positions" CRLF
+    "h Print this help" CRLF
+    "q quit (saving changes)" CRLF;
+
+BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
+  char ch;
+  bool done = false;
+  bool dirty = false;
+  get_pot_params(&pot_max, &pot_zero, &pot_1_turn);
+  // it is where it is
+  pot_setpoint = filtered_pot_word;
+
+  print_usb_string(nudge_prompt);
+
+  while (!done) {
+    ch = get_usb_char();
+    switch (ch) {
+    case 'a' :
+      nudge_setpoint(pot_setpoint + 2);
+      break;
+    case 's' :
+      nudge_setpoint(pot_setpoint - 2);
+      break;
+    case 'A':
+      nudge_setpoint(pot_setpoint + 9);
+      break;
+    case 'S':
+      nudge_setpoint(pot_setpoint - 9);
+      break;
+    case ',':
+    case '<':
+      nudge_setpoint(pot_setpoint + 153);
+      break;
+    case '.':
+    case '>':
+      nudge_setpoint(pot_setpoint - 153);
+      break;
+    case '?' :
+      print_usb_string(nudge_prompt);
+      break;
+    case 'u':
+      unlocked = true;
+      print_usb_string("Mechanism unlocked!" CRLF);
+      dirty = true;
+      break;
+    case 'l':
+      // if I change the setpoint, I should change the 1 Turn value as well
+      if (pot_setpoint != pot_max) {
+        pot_max = pot_setpoint;
+        pot_1_turn += pot_setpoint - pot_max;
+
+        // set pot_zero to something reasonable
+        if (pot_zero > pot_max)
+          pot_zero = pot_max - 10;
+        if (pot_zero < pot_1_turn)
+          pot_zero = pot_1_turn + 10;
+      }
+      unlocked = false;
+      dirty = true;
+      print_usb_string("Limit set" CRLF);
+      break;
+    case 'L':
+      nudge_setpoint(pot_max);
+      break;
+    case 't':
+      pot_1_turn = pot_setpoint;
+      if (pot_zero < pot_1_turn)
+        pot_zero = pot_1_turn + 10;
+      unlocked = false;
+      dirty = true;
+      print_usb_string("1 Turn value set" CRLF);
+      break;
+    case 'T':
+      nudge_setpoint(pot_1_turn);
+      break;
+    case 'z':
+      pot_zero = pot_setpoint;
+      unlocked = true;
+      dirty = true;
+      print_usb_string("Zero position set" CRLF);
+      break;
+    case '?':
+      SEGGER_RTT_printf()
+    case 'q':
+      done = true;
+      unlocked = false;
+      if (dirty) {
+        print_usb_string("Changes made. Save changes?");
+        char chr;
+        do {
+          chr = get_usb_char();
+        } while (chr != 'Y' && chr != 'y' && chr != 'N' && chr != 'n');
+        if (chr == 'Y' || chr == 'y') {
+            print_usb_string(CRLF "Saving movement parameters" CRLF);
+          save_pot_parameters(pot_max, pot_zero, pot_1_turn);
+        }
+      }
+    default:
+      motor_mode = MOTOR_OFF;
+      break;
+    }
+  }
+  strncpy(wbuf, CRLF "Nudge mode complete" CRLF, buf_len);
+  return pdFALSE;
+}
+
+CLI_Command_Definition_t cmd_nudge_def = {
+    .pxCommandInterpreter = command_nudge,
+    .pcCommand = "nudge",
+    .pcHelpString = "nudge" CRLF " Starts the motor nudging environment" CRLF CRLF,
+    .cExpectedNumberOfParameters = 0,
+};
+
 BaseType_t command_servo(char *wbuf, size_t buf_len, const char*cmd) {
   BaseType_t len;
   unsigned pot = atoi(FreeRTOS_CLIGetParameter(cmd, 1, &len));
+  unsigned tmp;
+
   if (pot > 4000 || pot < 100) {
     strncpy(wbuf, "Argument out of range" CRLF, buf_len);
   } else {
-    pot_setpoint = pot;
-    motor_mode = MOTOR_SERVO;
+    tmp = limit_pot(pot);
+    if (pot != tmp)
+      print_usb_string("Range limited ");
+    if (tmp != pot_setpoint) {
+      pot_setpoint = tmp;
+      motor_mode = MOTOR_SERVO;
+    }
     strncpy(wbuf, "Done" CRLF, buf_len);
   }
   return pdFALSE;
+}
+
+bool nudge_setpoint(unsigned int pot) {
+  unsigned int tmp;
+  bool limited = false;
+
+  if (!unlocked) {
+    if (pot < pot_1_turn)
+      tmp = pot_1_turn;
+    else if (pot > pot_max)
+      tmp = pot_max;
+    else
+      tmp = pot;
+    limited = tmp != pot;
+  } else
+    tmp = pot;
+
+  if (tmp != pot_setpoint) {
+    pot_setpoint = tmp;
+    motor_mode = MOTOR_SERVO;
+  }
+  if (limited)
+    print_usb_string("Motion limited. To move beyond the limits, unlock." CRLF);
+
+  return limited;
 }
 
 CLI_Command_Definition_t cmd_servo_def = {
@@ -126,7 +304,7 @@ BaseType_t command_stop(char *wbuf, size_t buf_len, const char*cmd) {
 
 CLI_Command_Definition_t cmd_motor_stop = {
     .pxCommandInterpreter = command_stop,
-    .pcCommand = "servo",
+    .pcCommand = "stop",
     .pcHelpString = "stop" CRLF " Immediately stop the motor" CRLF CRLF,
     .cExpectedNumberOfParameters = 0,
 };
@@ -168,7 +346,7 @@ void init_motor() {
 
   LL_DMA_SetPeriphAddress(DMA_ADC_MOTOR, DMA_CHANNEL_ADC_MOTOR, LL_ADC_DMA_GetRegAddr(ADC_MOTOR, LL_ADC_DMA_REG_REGULAR_DATA));
   LL_DMA_SetMemoryAddress(DMA_ADC_MOTOR, DMA_CHANNEL_ADC_MOTOR, (uint32_t)&adc_buffer);
-  LL_DMA_SetDataLength(DMA_ADC_MOTOR, DMA_CHANNEL_ADC_MOTOR, 4);
+  LL_DMA_SetDataLength(DMA_ADC_MOTOR, DMA_CHANNEL_ADC_MOTOR, 3);
   LL_DMA_EnableChannel(DMA_ADC_MOTOR, DMA_CHANNEL_ADC_MOTOR);
 
   // I need to enable the PWM outputs
@@ -194,20 +372,19 @@ void init_motor() {
   LL_ADC_REG_StartConversion(ADC_MOTOR);
 
   // set the motor PID gains
-  motor_pid.Kp = 0;   // gain is in units of mV/pot LSB in Q32.16
+  motor_pid.Kp = 400 << 21;   // gain is in units of mV/pot LSB in Q32.16
   motor_pid.Kd = 0;
   motor_pid.Ki = 0;
+
+  arm_pid_init_q31(&motor_pid, 1);
 
   FreeRTOS_CLIRegisterCommand(&cmd_vmot_def);
   FreeRTOS_CLIRegisterCommand(&cmd_servo_def);
   FreeRTOS_CLIRegisterCommand(&cmd_motor_stop);
+  FreeRTOS_CLIRegisterCommand(&cmd_nudge_def);
 
 }
 
-q31_t filtered_pot;
-int16_t filtered_pot_word;
-q31_t filtered_pot2;
-int speed;
 
 void motor_isr()
 {
@@ -243,13 +420,18 @@ void motor_isr()
     break;
   case MOTOR_SERVO:
   {
-    unsigned error = pot_setpoint - filtered_pot_word;
-    q31_t control = arm_pid_q31(&motor_pid, error);
-    if (control > 12000)
-      control = 12000;
-    else if (control < -12000)
-      control = -12000;
-    set_motor_v(control);
+    int error = pot_setpoint - filtered_pot_word;
+    if (iabs(error) < deadband_pot)
+      motor_mode = MOTOR_OFF;
+    else {
+      voltage = arm_pid_q31(&motor_pid, error*1024);
+      voltage += error > 0 ? 1200 : -1200;        // use a minimum value for the motor voltage
+      if (voltage > 12000)
+        voltage = 12000;
+      else if (voltage < -12000)
+        voltage = -12000;
+      set_motor_v(voltage);
+    }
   }
   default:
     break;

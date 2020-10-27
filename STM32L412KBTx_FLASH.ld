@@ -65,6 +65,8 @@ RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 40K
 FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
 }
 
+_size_of_cal_block = 4k;
+
 /* Define output sections */
 SECTIONS
 {
@@ -144,6 +146,7 @@ SECTIONS
 	. = ALIGN(8);
   } >FLASH
 
+
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 
@@ -159,7 +162,16 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
 
-  
+  /* place a 4k block at the end of memory */
+  .free_flash (NOLOAD) :
+  {
+    . = ORIGIN(FLASH) + LENGTH(FLASH) - _size_of_cal_block;
+  } > FLASH
+
+  .cal (NOLOAD) :
+  {
+  } > FLASH
+
   /* Uninitialized data section */
   . = ALIGN(4);
   .bss :

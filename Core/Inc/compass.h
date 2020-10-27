@@ -6,5 +6,6 @@
 #define GEO_00001_COMPASS_H
 
 void init_compass();
+void compass_isr();
 
 #endif //GEO_00001_COMPASS_H

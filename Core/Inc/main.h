@@ -34,15 +34,14 @@ extern "C" {
 #include "stm32l4xx.h"
 #include "stm32l4xx_ll_i2c.h"
 #include "stm32l4xx_ll_tim.h"
+#include "stm32l4xx_ll_system.h"
+#include "stm32l4xx_ll_gpio.h"
+#include "stm32l4xx_ll_exti.h"
 #include "stm32l4xx_ll_bus.h"
 #include "stm32l4xx_ll_cortex.h"
 #include "stm32l4xx_ll_rcc.h"
-#include "stm32l4xx_ll_system.h"
 #include "stm32l4xx_ll_utils.h"
 #include "stm32l4xx_ll_pwr.h"
-#include "stm32l4xx_ll_gpio.h"
-
-#include "stm32l4xx_ll_exti.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,21 +71,26 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define POT_Pin GPIO_PIN_0
+#define POT_Pin LL_GPIO_PIN_0
 #define POT_GPIO_Port GPIOA
-#define VIN_Pin GPIO_PIN_1
+#define VIN_Pin LL_GPIO_PIN_1
 #define VIN_GPIO_Port GPIOA
-#define MOT_L_POS_Pin GPIO_PIN_7
+#define IMOT_Pin LL_GPIO_PIN_2
+#define IMOT_GPIO_Port GPIOA
+#define DRDY_Pin LL_GPIO_PIN_6
+#define DRDY_GPIO_Port GPIOA
+#define DRDY_EXTI_IRQn EXTI9_5_IRQn
+#define MOT_L_POS_Pin LL_GPIO_PIN_7
 #define MOT_L_POS_GPIO_Port GPIOA
-#define MOT_L_NEG_Pin GPIO_PIN_0
+#define MOT_L_NEG_Pin LL_GPIO_PIN_0
 #define MOT_L_NEG_GPIO_Port GPIOB
-#define GRN_Pin GPIO_PIN_1
+#define GRN_Pin LL_GPIO_PIN_1
 #define GRN_GPIO_Port GPIOB
-#define MOT_H_POS_Pin GPIO_PIN_8
+#define MOT_H_POS_Pin LL_GPIO_PIN_8
 #define MOT_H_POS_GPIO_Port GPIOA
-#define MOT_H_NEG_Pin GPIO_PIN_9
+#define MOT_H_NEG_Pin LL_GPIO_PIN_9
 #define MOT_H_NEG_GPIO_Port GPIOA
-#define RED_Pin GPIO_PIN_4
+#define RED_Pin LL_GPIO_PIN_4
 #define RED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
