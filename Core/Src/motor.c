@@ -15,6 +15,7 @@
 #include "arm_math.h"
 #include "usb_io.h"
 #include "calibration_constants.h"
+#include "printf.h"
 
 
 #define ADC_MOTOR ADC1
@@ -39,8 +40,8 @@ static q31_t filtered_pot;
 static int16_t filtered_pot_word;
 static q31_t filtered_pot2;
 static int speed;
-
-bool nudge_setpoint(unsigned int pot);
+// this means the CCW backlash has been taken up
+static bool cw_backlash_taken;
 
 static enum {
   MOTOR_OFF,
@@ -55,15 +56,6 @@ static inline int iabs(int x)
 {
   return x < 0 ? -x : x;
 }
-
-// this is half of a 100 element Nuttall filter
-static const uint32_t coeffs[] = {
-    43289, 52621, 81422, 132113, 208721, 316864, 463734, 658056, 910046, 1231332, 1634862, 2134777, 2746251, 3485295,
-    4368522, 5412874, 6635303, 8052426, 9680136, 11533195, 13624799, 15966134, 18565934, 21430047, 24561018, 27957714,
-    31614994, 35523433, 39669124, 44033558, 48593589, 53321506, 58185191, 63148396, 68171105, 73210009, 78219064,
-    83150135, 87953710, 92579675, 96978124, 101100205, 104898957, 108330146, 111353065, 113931276, 116033296,
-    117633183, 118711034, 119253364,
-};
 
 // minimum input voltage in mV
 static float vin_min = 12.0f;
@@ -95,6 +87,34 @@ static const arm_biquad_casd_df1_inst_q31 pot_filter = {
     .postShift = 1,
 };
 
+bool nudge_by_pot(unsigned int pot);
+void move_to_pot(unsigned int pot);
+
+void move_to_angle(int angle) {
+  static int last_angle;
+  // total movement
+  int motion = angle - last_angle;
+
+  while (motion > 180) {
+    motion -= 360;
+    angle -= 360;
+  }
+
+  while (motion < -180) {
+    motion += 360;
+    angle += 360;
+  }
+
+  // motion will now be less than +/-180
+  // get the pot value (ccw backlash taken up) value
+  int pot = angle_to_pot(angle);
+  if (pot == 1)
+    pot = angle_to_pot(angle - 360);
+  else if (pot == -1)
+    pot = angle_to_pot(angle + 360);
+
+  move_to_pot(pot);
+}
 
 // A command to turn on the motor at a constant voltage for a time
 BaseType_t command_vmot(char *wbuf, size_t buf_len, const char*cmd) {
@@ -126,13 +146,14 @@ static const char nudge_prompt[] =
     "A = CCW ~5deg S = CW ~5deg" CRLF
     "< = CCW ~90deg > = CW ~90deg" CRLF
     "u - unlock max CCW rotation limit (dangerous!)" CRLF
-    "l - set CCW rotation limit" CRLF
-    "L - go to CCW rotation limit" CRLF
-    "t - set 360deg from limit" CRLF
-    "T - go to 360deg from limit" CRLF
-    "z - set zero position" CRLF
-    "Z - go to zero position" CRLF
+    "L - set CCW rotation limit" CRLF
+    "l - go to CCW rotation limit" CRLF
+    "T - set 360deg from limit" CRLF
+    "t - go to 360deg from limit" CRLF
+    "Z - set zero position" CRLF
+    "z - go to zero position" CRLF
     "? - print calibration positions" CRLF
+    "b - set mechanism backlash" CRLF
     "h Print this help" CRLF
     "q quit (saving changes)" CRLF;
 
@@ -143,6 +164,7 @@ BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
   get_pot_params(&pot_max, &pot_zero, &pot_1_turn);
   // it is where it is
   pot_setpoint = filtered_pot_word;
+  static char printf_buf[80];
 
   print_usb_string(nudge_prompt);
 
@@ -150,26 +172,26 @@ BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
     ch = get_usb_char();
     switch (ch) {
     case 'a' :
-      nudge_setpoint(pot_setpoint + 2);
+      nudge_by_pot(pot_setpoint + 2);
       break;
     case 's' :
-      nudge_setpoint(pot_setpoint - 2);
+      nudge_by_pot(pot_setpoint - 2);
       break;
     case 'A':
-      nudge_setpoint(pot_setpoint + 9);
+      nudge_by_pot(pot_setpoint + 9);
       break;
     case 'S':
-      nudge_setpoint(pot_setpoint - 9);
+      nudge_by_pot(pot_setpoint - 9);
       break;
     case ',':
     case '<':
-      nudge_setpoint(pot_setpoint + 153);
+      nudge_by_pot(pot_setpoint + 153);
       break;
     case '.':
     case '>':
-      nudge_setpoint(pot_setpoint - 153);
+      nudge_by_pot(pot_setpoint - 153);
       break;
-    case '?' :
+    case 'h' :
       print_usb_string(nudge_prompt);
       break;
     case 'u':
@@ -177,44 +199,104 @@ BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
       print_usb_string("Mechanism unlocked!" CRLF);
       dirty = true;
       break;
-    case 'l':
-      // if I change the setpoint, I should change the 1 Turn value as well
-      if (pot_setpoint != pot_max) {
-        pot_max = pot_setpoint;
-        pot_1_turn += pot_setpoint - pot_max;
+    case 'b':
+      {
+        unsigned backlash = get_backlash();
+        snprintf(wbuf, buf_len, "Enter backlash (0-9) pot units (current value = %d)" CRLF, backlash);
+        print_usb_string(wbuf);
 
-        // set pot_zero to something reasonable
-        if (pot_zero > pot_max)
-          pot_zero = pot_max - 10;
-        if (pot_zero < pot_1_turn)
-          pot_zero = pot_1_turn + 10;
+        char bch = get_usb_char();
+        if (bch >= '0' && bch <= '9')
+          backlash = bch - '0';
+        else if (bch >= 'A' && bch <= 'F')
+          backlash = bch - 'A' + 10;
+        else if (bch >= 'a' && bch <= 'f')
+          backlash = bch - 'a' + 10;
+
+        if (backlash != get_backlash()) {
+          save_backlash(backlash);
+          snprintf(wbuf, buf_len, CRLF "new value is %d" CRLF, backlash);
+          print_usb_string(wbuf);
+        } else {
+          print_usb_string(CRLF "backlash unchanged" CRLF);
+        }
       }
-      unlocked = false;
-      dirty = true;
-      print_usb_string("Limit set" CRLF);
       break;
     case 'L':
-      nudge_setpoint(pot_max);
+      // if I change the setpoint, I should change the 1 Turn value as well
+      // consider the backlash in setting the limit
+      {
+        unsigned limit = pot_setpoint;
+        if (cw_backlash_taken)
+          limit += get_backlash();
+
+        if (limit != pot_max) {
+          // change the 1 turn limit as well
+          pot_1_turn += limit - pot_max;
+          pot_max = limit;
+
+          // make certain pot_zero to something reasonable
+          if (pot_zero > pot_max)
+            pot_zero = pot_max - 10;
+          if (pot_zero < pot_1_turn)
+            pot_zero = pot_1_turn + 10;
+        }
+        unlocked = false;
+        dirty = true;
+        print_usb_string("Limit set" CRLF);
+      }
       break;
+    case 'l':
+      // this is a special case because the backlash isn't ever a factor
+      move_to_pot(pot_max);
+      break;
+    case 'T': {
+      unsigned limit = pot_setpoint;
+
+      // take care of backlash
+      if (cw_backlash_taken)
+        limit += get_backlash();
+
+      if (pot_1_turn != limit) {
+        pot_1_turn = limit;
+        if (pot_zero < pot_1_turn)
+          pot_zero = pot_1_turn + 10;
+        unlocked = false;
+        dirty = true;
+        print_usb_string("1 Turn value set" CRLF);
+      }
+    }
+    break;
     case 't':
-      pot_1_turn = pot_setpoint;
-      if (pot_zero < pot_1_turn)
-        pot_zero = pot_1_turn + 10;
-      unlocked = false;
-      dirty = true;
-      print_usb_string("1 Turn value set" CRLF);
+      move_to_pot(pot_1_turn);
       break;
-    case 'T':
-      nudge_setpoint(pot_1_turn);
-      break;
+    case 'Z': {
+      unsigned limit = pot_setpoint;
+
+      if (cw_backlash_taken)
+        limit += get_backlash();
+
+      if (limit != pot_zero) {
+        pot_zero = pot_setpoint;
+        unlocked = true;
+        dirty = true;
+        print_usb_string("Zero position set" CRLF);
+      }
+    }
+    break;
     case 'z':
-      pot_zero = pot_setpoint;
-      unlocked = true;
-      dirty = true;
-      print_usb_string("Zero position set" CRLF);
+      move_to_pot(pot_zero);
       break;
     case '?':
-      SEGGER_RTT_printf()
+      snprintf(wbuf, buf_len,
+               "pot limit:   %d" CRLF
+               "pot zero:    %d" CRLF
+               "pot 1 turn:  %d" CRLF
+               "current pot: %d" CRLF
+               "backlash:    %d" CRLF,
+               pot_max, pot_zero, pot_1_turn, pot_setpoint, get_backlash());
+      print_usb_string(wbuf);
+      break;
     case 'q':
       done = true;
       unlocked = false;
@@ -231,6 +313,7 @@ BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
       }
     default:
       motor_mode = MOTOR_OFF;
+      pot_setpoint = filtered_pot_word;
       break;
     }
   }
@@ -265,13 +348,47 @@ BaseType_t command_servo(char *wbuf, size_t buf_len, const char*cmd) {
   return pdFALSE;
 }
 
-bool nudge_setpoint(unsigned int pot) {
+// Go to the absolute pot position considering backlash
+void move_to_pot(unsigned int pot) {
+  // this is a CW motion so the pot must be offset by the backlash
+  if (pot == pot_setpoint) return;
+  if (pot < pot_setpoint) {
+    // turn CW
+    // If the CW backlash isn't taken up and the motion is less than backlash, don't move.
+    // The move would just reduce the backlash
+    if (!cw_backlash_taken) {
+      if ((pot_setpoint - pot) <= get_backlash() + 1)
+        return;
+    }
+    pot -= get_backlash();  // move extra for the backlash
+    cw_backlash_taken = true;   // the move will take up the cw backlash
+  } else {
+    // turn CCW
+    if (cw_backlash_taken) {
+      if ((pot - pot_setpoint) <= get_backlash() + 1)
+        return;
+    }
+    cw_backlash_taken = false;  // it is the ccw backlash that will be taken up
+  }
+  pot_setpoint = pot;
+  motor_mode = MOTOR_SERVO;
+}
+
+// this makes a relative move of the mechanism
+bool nudge_by_pot(unsigned int pot) {
   unsigned int tmp;
   bool limited = false;
 
+  // in all of the nudges, I want to take out the backlash if the
+  // motor changes direction
+  if (pot > pot_setpoint && cw_backlash_taken)
+    pot += get_backlash();
+  else if (pot < pot_setpoint && !cw_backlash_taken)
+    pot -= get_backlash();
+
   if (!unlocked) {
-    if (pot < pot_1_turn)
-      tmp = pot_1_turn;
+    if (pot < pot_1_turn - 20)
+      tmp = pot_1_turn - 20;
     else if (pot > pot_max)
       tmp = pot_max;
     else
@@ -281,6 +398,7 @@ bool nudge_setpoint(unsigned int pot) {
     tmp = pot;
 
   if (tmp != pot_setpoint) {
+    cw_backlash_taken = tmp < pot_setpoint;
     pot_setpoint = tmp;
     motor_mode = MOTOR_SERVO;
   }

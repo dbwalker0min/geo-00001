@@ -10,12 +10,37 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="RelWithDebInfo" CONFIG_NAME="RelWithDebInfo" />
     </configurations>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/Core/Inc/mag_cal.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Core/Src/mag_cal.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Middlewares/atan2/fxpt_atan2.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Middlewares/atan2/fxpt_atan2.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/OCD_geo_00001.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/OCD_geo_00001.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists_template.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists_template.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/calibration_constants.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/calibration_constants.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/motor.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/motor.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/usb_io.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/usb_io.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/calibration_constants.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/calibration_constants.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/compass.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/compass.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/freertos.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/freertos.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/motor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/motor.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Middlewares/printf" beforeDir="false" afterPath="$PROJECT_DIR$/Middlewares/printf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Middlewares/printf/test/catch.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Middlewares/printf/test/test_suite.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.ioc" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.ioc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug.user" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug.user" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,19 +48,24 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:RelWithDebInfo" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1icKcypnlKRjymq38ymPxd3EmO8" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="OCFindUsagesOptions.isSearchForTextOccurrences" value="false" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
@@ -54,12 +84,13 @@
     <property name="settings.editor.selected.configurable" value="CMakeSettings" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Documents\Firmware\geo-00001\Middlewares\atan2" />
+      <recent name="D:\Documents\Firmware\geo-00001\Core\Inc" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\Documents\Firmware\geo-00001\Middlewares\Third_Party\ARM_CMSIS\CMSIS\DSP\Lib" />
       <recent name="D:\Documents\Firmware\geo-00001" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Documents\Firmware\geo-00001\Core\Inc" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -68,9 +99,9 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
@@ -98,7 +129,8 @@
       <workItem from="1603058080978" duration="3347000" />
       <workItem from="1603382632489" duration="4763000" />
       <workItem from="1603390512467" duration="47516000" />
-      <workItem from="1603841371061" duration="819000" />
+      <workItem from="1603841371061" duration="12431000" />
+      <workItem from="1604102877597" duration="31869000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>
@@ -142,6 +174,7 @@
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="ADC coming along..." />
     <MESSAGE value="ADC and I2C working" />
     <MESSAGE value="Motor interrupts each time" />
@@ -149,6 +182,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="Stable state" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="1532" y="283" key="#Intentions" timestamp="1604103102681">
+      <screen x="0" y="0" width="3440" height="1400" />
+    </state>
+    <state x="1532" y="283" key="#Intentions/3440.0.1920.1040/0.0.3440.1400@0.0.3440.1400" timestamp="1604103102681" />
     <state x="4145" y="322" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1602266719275">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
@@ -161,18 +198,19 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4025" y="88" key="CommitChangelistDialog2/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603385288446" />
-    <state x="3611" y="167" key="SettingsEditor" timestamp="1603669310854">
-      <screen x="3440" y="0" width="1920" height="1040" />
+    <state x="306" y="225" key="SettingsEditor" timestamp="1603842645781">
+      <screen x="0" y="0" width="3440" height="1400" />
     </state>
+    <state x="306" y="225" key="SettingsEditor/3440.0.1920.1040/0.0.3440.1400@0.0.3440.1400" timestamp="1603842645781" />
     <state x="3611" y="167" key="SettingsEditor/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603669310854" />
     <state x="4426" y="96" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1603408922646">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4426" y="96" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603408922646" />
-    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1603671642168">
+    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1604256899317">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603671642168" />
+    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604256899317" />
     <state x="4387" y="274" width="550" height="427" key="refactoring.ChangeSignatureDialog" timestamp="1603758796186">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
@@ -181,5 +219,9 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4056" y="240" key="run.anything.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602206263964" />
+    <state x="1501" y="330" width="672" height="678" key="search.everywhere.popup" timestamp="1604103855491">
+      <screen x="0" y="0" width="3440" height="1400" />
+    </state>
+    <state x="1501" y="330" width="672" height="678" key="search.everywhere.popup/3440.0.1920.1040/0.0.3440.1400@0.0.3440.1400" timestamp="1604103855491" />
   </component>
 </project>

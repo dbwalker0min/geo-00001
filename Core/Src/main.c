@@ -625,6 +625,7 @@ void StartInitialTask(void *argument)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
 
+  // do this first!
   init_calibration_constants();
   i2c_init();
   init_compass();

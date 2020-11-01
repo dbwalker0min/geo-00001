@@ -205,7 +205,7 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 5 */
 #ifdef SEGGER_TRACE
-  SEGGER_RTT_WriteString(0, "Control FS\n");
+  SEGGER_RTT_printf(0, "Control FS %d, %d\n", cmd, length);
 #endif
 
   switch (cmd) {
@@ -396,6 +396,30 @@ void write_usb(const void *buf, unsigned buf_len) {
   osKernelRestoreLock(state);
 }
 
+__weak void on_host_port_opened() {}
+__weak void on_host_port_closed() {}
+
+void host_connect_delay_fn(void* arg) {
+  print_usb_string(CRLF "BHG-1 Setup" CRLF "> ");
+  on_host_port_opened();
+}
+
+// TODO: Also check for a USB character and use an event to signal success
+void vApplicationIdleHook() {
+  static bool last_host_port_opened = false;
+  static osTimerId_t host_connection_delay_timer = NULL;
+
+  if (!host_connection_delay_timer) {
+    host_connection_delay_timer = osTimerNew(&host_connect_delay_fn, osTimerOnce, 0, NULL);
+  }
+
+  if (!last_host_port_opened && host_port_open) {
+    osTimerStart(host_connection_delay_timer, 10);
+  } else if (last_host_port_opened && !host_port_open) {
+    on_host_port_closed();
+  }
+  last_host_port_opened = host_port_open;
+}
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**

@@ -17,6 +17,9 @@ static inline void put_usb_char(char ch) {
   write_usb(&ch, 1);
 }
 
+extern void on_host_port_opened();
+extern void on_host_port_closed();
+
 #define CRLF "\r\n"
 
 #endif //GEO_00001_USB_IO_H

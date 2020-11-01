@@ -41,6 +41,7 @@ file(GLOB_RECURSE SOURCES "CMSIS/*.*" "startup/*.*" "USB_DEVICE/*.*" "Middleware
 include_directories(Middlewares/Segger_RTT/RTT)
 include_directories(Middlewares/Third_Party/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI)
 include_directories(Middlewares/printf)
+include_directories(Middlewares/atan2)
 include_directories(USB_DEVICE/App USB_DEVICE/Target Core/Inc Drivers/STM32L4xx_HAL_Driver/Inc Drivers/STM32L4xx_HAL_Driver/Inc/Legacy Middlewares/ST/STM32_USB_Device_Library/Core/Inc Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc Drivers/CMSIS/Device/ST/STM32L4xx/Include Drivers/CMSIS/Include Middlewares/Third_Party/FreeRTOS/Source/include Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Include)
 link_directories(Middlewares/Third_Party/ARM_CMSIS/CMSIS/DSP/Lib)
 
