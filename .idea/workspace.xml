@@ -15,32 +15,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Core/Inc/mag_cal.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Core/Src/mag_cal.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Middlewares/atan2/fxpt_atan2.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Middlewares/atan2/fxpt_atan2.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/OCD_geo_00001.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/OCD_geo_00001.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists_template.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists_template.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/FreeRTOSConfig.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/calibration_constants.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/calibration_constants.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/motor.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/motor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Inc/usb_io.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/usb_io.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/led.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/calibration_constants.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/calibration_constants.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/compass.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/compass.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Src/freertos.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/freertos.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Src/led.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/main.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Src/motor.c" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Src/motor.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Middlewares/printf" beforeDir="false" afterPath="$PROJECT_DIR$/Middlewares/printf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Middlewares/printf/test/catch.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Middlewares/printf/test/test_suite.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" beforeDir="false" afterPath="$PROJECT_DIR$/USB_DEVICE/App/usbd_cdc_if.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/geo-00001.ioc" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.ioc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/geo-00001.jdebug.user" beforeDir="false" afterPath="$PROJECT_DIR$/geo-00001.jdebug.user" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +33,9 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:RelWithDebInfo" />
+  <component name="ExportToHTMLSettings">
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../geo-00001\exportToHTML" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -130,7 +114,7 @@
       <workItem from="1603382632489" duration="4763000" />
       <workItem from="1603390512467" duration="47516000" />
       <workItem from="1603841371061" duration="12431000" />
-      <workItem from="1604102877597" duration="31869000" />
+      <workItem from="1604102877597" duration="35551000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>
@@ -167,7 +151,14 @@
       <option name="project" value="LOCAL" />
       <updated>1603385290356</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="It all is working more or less">
+      <created>1604273026058</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1604273026058</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,7 +170,8 @@
     <MESSAGE value="ADC and I2C working" />
     <MESSAGE value="Motor interrupts each time" />
     <MESSAGE value="Stable state" />
-    <option name="LAST_COMMIT_MESSAGE" value="Stable state" />
+    <MESSAGE value="It all is working more or less" />
+    <option name="LAST_COMMIT_MESSAGE" value="It all is working more or less" />
   </component>
   <component name="WindowStateProjectService">
     <state x="1532" y="283" key="#Intentions" timestamp="1604103102681">
@@ -190,14 +182,14 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4145" y="322" key="#com.intellij.fileTypes.FileTypeChooser/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602266719275" />
-    <state x="4130" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1602693626732">
+    <state x="4130" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1604277301716">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4130" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1602693626732" />
-    <state x="4025" y="88" key="CommitChangelistDialog2" timestamp="1603385288446">
+    <state x="4130" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604277301716" />
+    <state x="4025" y="88" key="CommitChangelistDialog2" timestamp="1604273022771">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4025" y="88" key="CommitChangelistDialog2/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603385288446" />
+    <state x="4025" y="88" key="CommitChangelistDialog2/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604273022771" />
     <state x="306" y="225" key="SettingsEditor" timestamp="1603842645781">
       <screen x="0" y="0" width="3440" height="1400" />
     </state>
@@ -207,10 +199,10 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4426" y="96" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603408922646" />
-    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1604256899317">
+    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1604277280049">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604256899317" />
+    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604277280049" />
     <state x="4387" y="274" width="550" height="427" key="refactoring.ChangeSignatureDialog" timestamp="1603758796186">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>

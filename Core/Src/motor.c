@@ -108,37 +108,17 @@ void move_to_angle(int angle) {
   // motion will now be less than +/-180
   // get the pot value (ccw backlash taken up) value
   int pot = angle_to_pot(angle);
-  if (pot == 1)
-    pot = angle_to_pot(angle - 360);
-  else if (pot == -1)
-    pot = angle_to_pot(angle + 360);
-
+  if (pot == 1) {
+    angle -= 360;
+    pot = angle_to_pot(angle);
+  }  else if (pot == -1) {
+    angle += 360;
+    pot = angle_to_pot(angle);
+  }
+  SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
   move_to_pot(pot);
+  last_angle = angle;
 }
-
-// A command to turn on the motor at a constant voltage for a time
-BaseType_t command_vmot(char *wbuf, size_t buf_len, const char*cmd) {
-  BaseType_t len;
-  int temp_v = atoi(FreeRTOS_CLIGetParameter(cmd, 1, &len));
-  int temp_t = atoi(FreeRTOS_CLIGetParameter(cmd, 2, &len));
-
-  // set them all atomically
-  __disable_irq();
-  time = temp_t;
-  voltage = temp_v;
-  motor_mode = MOTOR_CONS_V_FOR_TIME;
-  __enable_irq();
-
-  strncpy(wbuf, "Done", buf_len);
-  return pdFALSE;
-}
-
-CLI_Command_Definition_t cmd_vmot_def = {
-    .pxCommandInterpreter = command_vmot,
-    .pcCommand = "vmot",
-    .pcHelpString = "vmot <mV> <nticks>:\r\n Turn the motor at a fixed voltage\r\n\r\n",
-    .cExpectedNumberOfParameters = 2,
-};
 
 static const char nudge_prompt[] =
     "Motor nudge mode" CRLF
@@ -157,7 +137,7 @@ static const char nudge_prompt[] =
     "h Print this help" CRLF
     "q quit (saving changes)" CRLF;
 
-BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
+BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
   char ch;
   bool done = false;
   bool dirty = false;
@@ -321,32 +301,12 @@ BaseType_t command_nudge(char *wbuf, size_t buf_len, const char *cmd) {
   return pdFALSE;
 }
 
-CLI_Command_Definition_t cmd_nudge_def = {
-    .pxCommandInterpreter = command_nudge,
-    .pcCommand = "nudge",
-    .pcHelpString = "nudge" CRLF " Starts the motor nudging environment" CRLF CRLF,
+CLI_Command_Definition_t cmd_motor = {
+    .pxCommandInterpreter = command_motor,
+    .pcCommand = "motor",
+    .pcHelpString = "motor" CRLF " Setup the motion parameters" CRLF CRLF,
     .cExpectedNumberOfParameters = 0,
 };
-
-BaseType_t command_servo(char *wbuf, size_t buf_len, const char*cmd) {
-  BaseType_t len;
-  unsigned pot = atoi(FreeRTOS_CLIGetParameter(cmd, 1, &len));
-  unsigned tmp;
-
-  if (pot > 4000 || pot < 100) {
-    strncpy(wbuf, "Argument out of range" CRLF, buf_len);
-  } else {
-    tmp = limit_pot(pot);
-    if (pot != tmp)
-      print_usb_string("Range limited ");
-    if (tmp != pot_setpoint) {
-      pot_setpoint = tmp;
-      motor_mode = MOTOR_SERVO;
-    }
-    strncpy(wbuf, "Done" CRLF, buf_len);
-  }
-  return pdFALSE;
-}
 
 // Go to the absolute pot position considering backlash
 void move_to_pot(unsigned int pot) {
@@ -407,25 +367,6 @@ bool nudge_by_pot(unsigned int pot) {
 
   return limited;
 }
-
-CLI_Command_Definition_t cmd_servo_def = {
-    .pxCommandInterpreter = command_servo,
-    .pcCommand = "servo",
-    .pcHelpString = "servo <pot>" CRLF " Servo the motor to the specified pot position" CRLF CRLF,
-    .cExpectedNumberOfParameters = 1,
-};
-
-BaseType_t command_stop(char *wbuf, size_t buf_len, const char*cmd) {
-  motor_mode = MOTOR_OFF;
-  return pdFALSE;
-}
-
-CLI_Command_Definition_t cmd_motor_stop = {
-    .pxCommandInterpreter = command_stop,
-    .pcCommand = "stop",
-    .pcHelpString = "stop" CRLF " Immediately stop the motor" CRLF CRLF,
-    .cExpectedNumberOfParameters = 0,
-};
 
 // return true if input voltage greater than specified vin.
 static bool check_vin() {
@@ -496,10 +437,7 @@ void init_motor() {
 
   arm_pid_init_q31(&motor_pid, 1);
 
-  FreeRTOS_CLIRegisterCommand(&cmd_vmot_def);
-  FreeRTOS_CLIRegisterCommand(&cmd_servo_def);
-  FreeRTOS_CLIRegisterCommand(&cmd_motor_stop);
-  FreeRTOS_CLIRegisterCommand(&cmd_nudge_def);
+  FreeRTOS_CLIRegisterCommand(&cmd_motor);
 
 }
 

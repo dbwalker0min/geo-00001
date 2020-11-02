@@ -55,7 +55,7 @@ const struct calibration_data cal_defaults = {
 };
 
 // this is the overlap in degrees to prevent chattering
-static const int deg_overlap = 10;
+static const int deg_overlap = 30;
 static struct calibration_data cal_data;
 
 // "derived" constants
@@ -150,7 +150,7 @@ void erase_cal() {
 
 void compute_derived_constants() {
   min_angle = pot_to_angle(cal_data.pot_max);
-  pot_min = cal_data.pot_1_turn + (cal_data.pot_1_turn - cal_data.pot_max) * (deg_overlap + 1);
+  pot_min = cal_data.pot_1_turn + (cal_data.pot_1_turn - cal_data.pot_max) * (deg_overlap + 1)/360;
 }
 
 int pot_to_angle(unsigned int pot) {
@@ -161,7 +161,7 @@ int angle_to_pot(int angle) {
   unsigned pot = cal_data.pot_zero + ((cal_data.pot_1_turn - cal_data.pot_max)*angle)/360;
   if (pot > cal_data.pot_max)
     return -1;
-  if (pot < cal_data.pot_1_turn - deg_overlap*2)
+  if (pot < pot_min)
     return 1;
   return pot;
 }

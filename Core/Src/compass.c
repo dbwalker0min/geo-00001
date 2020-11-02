@@ -108,6 +108,8 @@ static int16_t compass_data[3];
 
 __NO_RETURN void task_compass(void* arg)
 {
+  unsigned startup_delay = 100;
+
   // access the WHOAMI register (0x0F)
   uint8_t buf;
 
@@ -118,7 +120,6 @@ __NO_RETURN void task_compass(void* arg)
   compass_config();
 
   // wait 1 second before running
-  osDelay(100);
 
   // perform calibration
   while (1) {
@@ -132,12 +133,13 @@ __NO_RETURN void task_compass(void* arg)
       arm_biquad_cascade_df1_f32(&mag_y_filterdef, &y, &filtered_mag_y, 1);
 
       // compute the heading in degrees
-      hdg = atan2f(filtered_mag_y, -filtered_mag_x)*57.29577951f;
-      if (!pause_loop)
+      hdg = atan2f(filtered_mag_y, -filtered_mag_x)*57.29577951f - 10.f;
+      if (!pause_loop && startup_delay == 0)
         move_to_angle(-(int)hdg);
     } else {
       osDelay(1);
     }
+    if (startup_delay) startup_delay--;
   }
 }
 

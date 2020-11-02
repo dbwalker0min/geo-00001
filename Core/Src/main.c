@@ -30,7 +30,6 @@
 #include "usb_io.h"
 #include <SEGGER_RTT.h>
 #include "FreeRTOS_CLI.h"
-#include "led.h"
 #include "calibration_constants.h"
 /* USER CODE END Includes */
 
@@ -82,18 +81,6 @@ void StartInitialTask(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-BaseType_t hello_command(char *wbuf, size_t buf_len, const char *cmd) {
-  strncpy(wbuf, "Hello USB!\n", buf_len);
-  return pdFALSE;
-}
-
-CLI_Command_Definition_t hello_cmd_def = {
-    .pcCommand = "hello",
-    .pxCommandInterpreter = &hello_command,
-    .cExpectedNumberOfParameters = 0,
-    .pcHelpString = "hello:\r\n A simple command to test the interface\r\n\r\n"
-};
 
 void vApplicationMallocFailedHook(){
   while(1);
@@ -630,10 +617,7 @@ void StartInitialTask(void *argument)
   i2c_init();
   init_compass();
   init_motor();
-  init_led();
-
-  FreeRTOS_CLIRegisterCommand(&hello_cmd_def);
-
+  
   /* Infinite loop */
   for(;;)
   {
