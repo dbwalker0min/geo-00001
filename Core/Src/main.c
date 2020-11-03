@@ -617,7 +617,7 @@ void StartInitialTask(void *argument)
   i2c_init();
   init_compass();
   init_motor();
-  
+
   /* Infinite loop */
   for(;;)
   {

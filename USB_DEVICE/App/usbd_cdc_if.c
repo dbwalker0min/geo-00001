@@ -27,6 +27,7 @@
 #include <cmsis_os2.h>
 #include "usb_io.h"
 #include <stdbool.h>
+#include "version.h"
 
 /* USER CODE END INCLUDE */
 
@@ -67,7 +68,7 @@
   */
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
-#define SEGGER_TRACE 1
+#define SEGGER_TRACE 0
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -400,7 +401,10 @@ __weak void on_host_port_opened() {}
 __weak void on_host_port_closed() {}
 
 void host_connect_delay_fn(void* arg) {
-  print_usb_string(CRLF "BHG-1 Setup" CRLF "> ");
+  print_usb_string(CRLF
+  "BHG-3 Compass Controller Setup " VERSION_STRING CRLF
+  __DATE__ " " __TIME__ CRLF
+  "> ");
   on_host_port_opened();
 }
 

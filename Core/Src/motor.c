@@ -115,7 +115,7 @@ void move_to_angle(int angle) {
     angle += 360;
     pot = angle_to_pot(angle);
   }
-  SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
+  // SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
   move_to_pot(pot);
   last_angle = angle;
 }

@@ -68,7 +68,7 @@ static BaseType_t command_magcal(char *wbuf, size_t buf_len, const char *cmd);
 CLI_Command_Definition_t cmd_mcal = {
     .pxCommandInterpreter = command_magcal,
     .pcCommand = "mcal",
-    .pcHelpString = "mcal 0|1|on|off" CRLF "Start or stop a magnetic calibration" CRLF CRLF,
+    .pcHelpString = "mcal 0|1|on|off" CRLF " Start or stop a magnetic calibration" CRLF CRLF,
     .cExpectedNumberOfParameters = 1,
 };
 
@@ -114,7 +114,7 @@ __NO_RETURN void task_compass(void* arg)
   uint8_t buf;
 
   i2c_wr(LIS3_I2C_ADDR, "\x0F", 1, &buf, 1);
-  SEGGER_RTT_printf(0, "Who am I = %d\n", buf);
+  // SEGGER_RTT_printf(0, "Who am I = %d\n", buf);
 
   // reconfigure compass for proper operation
   compass_config();

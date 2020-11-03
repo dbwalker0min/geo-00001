@@ -3,10 +3,13 @@
 //
 #include "calibration_constants.h"
 #include <memory.h>
-#include <mag_cal.h>
+#include <FreeRTOS.h>
+#include <FreeRTOS_CLI.h>
+#include <projdefs.h>
 #include "stm32l4xx.h"
 #include "stm32l4xx_hal_flash.h"
 #include "stm32l4xx_hal_flash_ex.h"
+#include "usb_io.h"
 
 // This uses 4k of flash located at the end of flash to store calibration constants. Each constant
 // is stored using a 8-byte block.
@@ -95,14 +98,6 @@ void save_backlash(uint16_t backlash) {
   write_cal_block(&cb);
 }
 
-uint16_t get_backlash() {
-  return cal_data.backlash;
-}
-
-int16_t *get_mag_bias() {
-  return cal_data.mag_bias;
-}
-
 void save_pot_parameters(uint16_t pot_max, uint16_t pot_zero, uint16_t pot_1_turn) {
   struct cal_block cb;
 
@@ -135,6 +130,14 @@ void write_cal_block(const struct cal_block *cb) {
 }
 #pragma clang diagnostic pop
 
+uint16_t get_backlash() {
+  return cal_data.backlash;
+}
+
+int16_t *get_mag_bias() {
+  return cal_data.mag_bias;
+}
+
 void erase_cal() {
   FLASH_EraseInitTypeDef page_erase = {
       .Page = ((size_t)calblocks - FLASH_BASE)/FLASH_PAGE_SIZE,
@@ -146,7 +149,31 @@ void erase_cal() {
   uint32_t error;
   HAL_FLASHEx_Erase(&page_erase, &error);
   HAL_FLASH_Lock();
+
+  // make all of the calibration data default too
+  memcpy(&cal_data, &cal_defaults, sizeof(cal_defaults));
 }
+
+static BaseType_t command_erase(char *wbuf, size_t buf_len, const char *cmd) {
+  print_usb_string(
+      "This command will delete ALL calibration data." CRLF
+      "Do you want to proceed? (y/N)" CRLF);
+  char cch = get_usb_char();
+  if (cch == 'y' || cch == 'Y') {
+    erase_cal();
+    strncpy(wbuf, "Calibration data erased" CRLF, buf_len);
+  } else {
+    strncpy(wbuf, "Calibration data retained" CRLF, buf_len);
+  }
+  return pdFALSE;
+}
+
+CLI_Command_Definition_t cmd_erase = {
+    .pxCommandInterpreter = command_erase,
+    .pcCommand = "erase",
+    .pcHelpString = "erase" CRLF " Erase all calibrations and return to factory defaults" CRLF CRLF,
+    .cExpectedNumberOfParameters = 0,
+};
 
 void compute_derived_constants() {
   min_angle = pot_to_angle(cal_data.pot_max);
@@ -204,6 +231,7 @@ void init_calibration_constants()
       cal_data_blk_ptr++;
       break;
     case CAL_MAGNETIC:
+      memcpy(cal_data.mag_bias, cal_data_blk_ptr->v16, 6);
       save_mag_bias(cal_data_blk_ptr->v16);
       cal_data_blk_ptr++;
       break;
@@ -221,5 +249,7 @@ void init_calibration_constants()
   // at this point, cal_data_blk_ptr is pointing to the next free entry and
   // the calibration variables are set
   compute_derived_constants();
+  FreeRTOS_CLIRegisterCommand(&cmd_erase);
+
 }
 
