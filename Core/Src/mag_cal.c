@@ -24,6 +24,14 @@ void mag_cal_clear() {
   memset(&cal_stats, 0, sizeof(cal_stats));
 }
 
+bool mag_cal_state() {
+  return mag_cal;
+}
+
+void mag_cal_cancel() {
+  mag_cal = false;
+}
+
 void mag_cal_calculate(int16_t adjustment[3]) {
   // compute ~B x ~B^T. The idea is to do all of the math with integers, then change to floating point to
   // preserve precision

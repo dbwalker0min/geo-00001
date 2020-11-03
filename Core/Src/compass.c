@@ -11,6 +11,7 @@
 #include <arm_math.h>
 #include <stdbool.h>
 #include <motor.h>
+#include <calibration_constants.h>
 #include "compass.h"
 #include "i2c.h"
 #include "stm32l4xx_ll_gpio.h"
@@ -68,7 +69,7 @@ static BaseType_t command_magcal(char *wbuf, size_t buf_len, const char *cmd);
 CLI_Command_Definition_t cmd_mcal = {
     .pxCommandInterpreter = command_magcal,
     .pcCommand = "mcal",
-    .pcHelpString = "mcal 0|1|on|off" CRLF "Start or stop a magnetic calibration" CRLF CRLF,
+    .pcHelpString = "mcal 0|1|on|off|show|cancel" CRLF " Start, stop, cancel, or show a magnetic calibration" CRLF CRLF,
     .cExpectedNumberOfParameters = 1,
 };
 
@@ -103,7 +104,6 @@ static int compass_config()
   i2c_w(LIS3_I2C_ADDR, "\x22\x00", 2);    // CTRL_REG3 : Continuous conversions
 }
 
-
 static int16_t compass_data[3];
 
 __NO_RETURN void task_compass(void* arg)
@@ -114,7 +114,7 @@ __NO_RETURN void task_compass(void* arg)
   uint8_t buf;
 
   i2c_wr(LIS3_I2C_ADDR, "\x0F", 1, &buf, 1);
-  SEGGER_RTT_printf(0, "Who am I = %d\n", buf);
+  // SEGGER_RTT_printf(0, "Who am I = %d\n", buf);
 
   // reconfigure compass for proper operation
   compass_config();
@@ -146,6 +146,10 @@ __NO_RETURN void task_compass(void* arg)
 BaseType_t command_magcal(char *wbuf, size_t buf_len, const char *cmd) {
   BaseType_t len;
   const char* param = FreeRTOS_CLIGetParameter(cmd, 1, &len);
+  if (param == NULL) {
+    param = mag_cal_state() ? "0" : "1";
+  }
+
   if (strcmp(param, "1") == 0 || strcmp(param, "on") == 0) {
     strncpy(wbuf, "Calibration started" CRLF, buf_len);
     mag_cal_start();
@@ -155,6 +159,12 @@ BaseType_t command_magcal(char *wbuf, size_t buf_len, const char *cmd) {
     mag_cal_stop(offsets);
     snprintf(wbuf, buf_len, "Calibration complete" CRLF "offset = [%d, %d, %d]" CRLF,
              offsets[0], offsets[1], offsets[2]);
+  } else if (strcmp(param, "show") == 0) {
+    int16_t *cal = get_mag_bias();
+    snprintf(wbuf, buf_len, "bias = [%d, %d, %d]" CRLF, cal[0], cal[1], cal[2]);
+  } else if (strcmp(param, "cancel") == 0) {
+    mag_cal_cancel();
+    strncpy(wbuf, "Calibration canceled" CRLF, buf_len);
   } else {
     strncpy(wbuf, "Unrecoginzed argument must be 0|1|on|off" CRLF, buf_len);
   }
