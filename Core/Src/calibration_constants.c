@@ -35,7 +35,7 @@ struct __packed cal_block {
 };
 
 struct calibration_data {
-  int16_t pot_max;
+  int16_t pot_min;
   int16_t pot_zero;
   int16_t pot_1_turn;
   int16_t hdg_offset;
@@ -43,27 +43,29 @@ struct calibration_data {
   int16_t mag_bias[3];
 };
 
-// this is the midpoint of the pot minus 5 degrees
-const int16_t pot_max_default = (int)(0.5*4096) - (int)(5.0/360*1.5/10*4096);
-const int16_t pot_max_minus_360_default = pot_max_default - (int)(1.5/10*4096);
-const int16_t pot_zero_default = (pot_max_default + pot_max_minus_360_default)/2;
+#define POT_FROM_ANGLE(a) (a/360.f*1.5/10 *4096)
+
+// this is the midpoint of the pot plus 5 degrees
+const int16_t pot_min_default = (int)(0.5 * 4096) + (int)POT_FROM_ANGLE(5);
+const int16_t pot_1_turn_default = pot_min_default + (int)POT_FROM_ANGLE(360);
+const int16_t pot_zero_default = (pot_min_default + pot_1_turn_default) / 2;
 
 const struct calibration_data cal_defaults = {
-    .pot_max = pot_max_default,
+    .pot_min = pot_min_default,
     .pot_zero = pot_zero_default,
-    .pot_1_turn = pot_max_minus_360_default,
+    .pot_1_turn = pot_1_turn_default,
     .mag_bias = {0, 0, 0},
     .hdg_offset = 0,
     .backlash = 0,
 };
 
 // this is the overlap in degrees to prevent chattering
-static const int deg_overlap = 30;
+static const int deg_overlap = 20;
 static struct calibration_data cal_data;
 
 // "derived" constants
-static int16_t min_angle;
-static int16_t pot_min;     // This is pot_max - 1 Turn - 10 degrees
+static int16_t max_angle;
+static int16_t pot_max;     // This is pot_min + 1 Turn + degrees_overlap
 
 unsigned n_cal_blocks = 4096/8;
 
@@ -74,7 +76,6 @@ static struct cal_block *cal_data_blk_ptr;
 static void write_cal_block(const struct cal_block *cb);
 void erase_cal();
 void compute_derived_constants();
-int pot_to_angle(unsigned pot);
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "misc-no-recursion"
@@ -98,16 +99,16 @@ void save_backlash(uint16_t backlash) {
   write_cal_block(&cb);
 }
 
-void save_pot_parameters(uint16_t pot_max, uint16_t pot_zero, uint16_t pot_1_turn) {
+void save_pot_parameters(uint16_t pot_min, uint16_t pot_zero, uint16_t pot_1_turn) {
   struct cal_block cb;
 
   // make the calibration data match what is saved
-  cal_data.pot_max = pot_max;
+  cal_data.pot_min = pot_min;
   cal_data.pot_1_turn = pot_1_turn;
   cal_data.pot_zero = pot_zero;
 
   cb.type = CAL_POT_PARAMS;
-  cb.pot_max = pot_max;
+  cb.pot_max = pot_min;
   cb.pot_zero = pot_zero;
   cb.pot_1_turn = pot_1_turn;
   write_cal_block(&cb);
@@ -119,7 +120,7 @@ void write_cal_block(const struct cal_block *cb) {
     erase_cal();
     // this stops a recursive call
     if (cb->type != CAL_POT_PARAMS)
-      save_pot_parameters(cal_data.pot_max, cal_data.pot_zero, cal_data.pot_1_turn);
+      save_pot_parameters(cal_data.pot_min, cal_data.pot_zero, cal_data.pot_1_turn);
     if (cb->type != CAL_MAGNETIC)
       save_mag_bias(cal_data.mag_bias);
   }
@@ -176,41 +177,24 @@ CLI_Command_Definition_t cmd_erase = {
 };
 
 void compute_derived_constants() {
-  min_angle = pot_to_angle(cal_data.pot_max);
-  pot_min = cal_data.pot_1_turn + (cal_data.pot_1_turn - cal_data.pot_max) * (deg_overlap + 1)/360;
-}
-
-int pot_to_angle(unsigned int pot) {
-  return -(360*((int)pot - cal_data.pot_zero))/(cal_data.pot_1_turn - cal_data.pot_max);
+  pot_max = cal_data.pot_1_turn + POT_FROM_ANGLE(deg_overlap);
 }
 
 int angle_to_pot(int angle) {
-  unsigned pot = cal_data.pot_zero + ((cal_data.pot_1_turn - cal_data.pot_max)*angle)/360;
-  if (pot > cal_data.pot_max)
+  unsigned pot = cal_data.pot_zero - ((cal_data.pot_1_turn - cal_data.pot_min) * angle) / 360;
+  if (pot < cal_data.pot_min)
     return -1;
-  if (pot < pot_min)
+  if (pot > pot_max)
     return 1;
-  return pot;
-}
-
-
-uint16_t limit_pot(uint16_t pot) {
-  if (pot > cal_data.pot_max)
-    return cal_data.pot_max;
-  
-  if (pot < pot_min)
-    return cal_data.pot_max;
-  return pot;
+  return (int)pot;
 }
 
 static inline int iabs(int i) {
   return i >= 0 ? i : -i;
 }
 
-int angle_to_pot_from_angle(int angle, int from_angle);
-
-void get_pot_params(uint16_t *pot_max, uint16_t *pot_zero, uint16_t *pot_1_turn) {
-  *pot_max = cal_data.pot_max;
+void get_pot_params(uint16_t *pot_min, uint16_t *pot_zero, uint16_t *pot_1_turn) {
+  *pot_min = cal_data.pot_min;
   *pot_zero = cal_data.pot_zero;
   *pot_1_turn = cal_data.pot_1_turn;
 }
@@ -225,7 +209,7 @@ void init_calibration_constants()
   for (int i=0; i < n_cal_blocks && !done; i++ ) {
     switch (cal_data_blk_ptr->type) {
     case CAL_POT_PARAMS:
-      cal_data.pot_max = cal_data_blk_ptr->pot_max;
+      cal_data.pot_min = cal_data_blk_ptr->pot_max;
       cal_data.pot_zero = cal_data_blk_ptr->pot_zero;
       cal_data.pot_1_turn = cal_data_blk_ptr->pot_1_turn;
       cal_data_blk_ptr++;

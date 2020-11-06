@@ -28,7 +28,7 @@ static struct {
   uint16_t vin;
 } adc_buffer;
 
-static uint16_t pot_max;
+static uint16_t pot_min;
 static uint16_t pot_1_turn;
 static uint16_t pot_zero;
 
@@ -88,12 +88,13 @@ static const arm_biquad_casd_df1_inst_q31 pot_filter = {
 };
 
 bool nudge_by_pot(unsigned int pot);
-void move_to_pot(unsigned int pot);
+void move_to_pot(unsigned int pos);
 
 void move_to_angle(int angle) {
-  static int last_angle;
+  int current_angle = angle_now();
+
   // total movement
-  int motion = angle - last_angle;
+  int motion = angle - current_angle;
 
   while (motion > 180) {
     motion -= 360;
@@ -109,15 +110,15 @@ void move_to_angle(int angle) {
   // get the pot value (ccw backlash taken up) value
   int pot = angle_to_pot(angle);
   if (pot == 1) {
-    angle -= 360;
-    pot = angle_to_pot(angle);
-  }  else if (pot == -1) {
     angle += 360;
     pot = angle_to_pot(angle);
+  }  else if (pot == -1) {
+    angle -= 360;
+    pot = angle_to_pot(angle);
   }
-  // SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
+  SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
   move_to_pot(pot);
-  last_angle = angle;
+  current_angle = angle;
 }
 
 static const char nudge_prompt[] =
@@ -141,7 +142,9 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
   char ch;
   bool done = false;
   bool dirty = false;
-  get_pot_params(&pot_max, &pot_zero, &pot_1_turn);
+
+  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
+
   // it is where it is
   pot_setpoint = filtered_pot_word;
   static char printf_buf[80];
@@ -210,25 +213,17 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
         if (cw_backlash_taken)
           limit += get_backlash();
 
-        if (limit != pot_max) {
-          // change the 1 turn limit as well
-          pot_1_turn += limit - pot_max;
-          pot_max = limit;
-
-          // make certain pot_zero to something reasonable
-          if (pot_zero > pot_max)
-            pot_zero = pot_max - 10;
-          if (pot_zero < pot_1_turn)
-            pot_zero = pot_1_turn + 10;
+        if (limit != pot_min) {
+          pot_min = limit;
+          dirty = true;
+          print_usb_string("Limit set" CRLF);
         }
         unlocked = false;
-        dirty = true;
-        print_usb_string("Limit set" CRLF);
       }
       break;
     case 'l':
       // this is a special case because the backlash isn't ever a factor
-      move_to_pot(pot_max);
+      move_to_pot(pot_min);
       break;
     case 'T': {
       unsigned limit = pot_setpoint;
@@ -239,12 +234,10 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
 
       if (pot_1_turn != limit) {
         pot_1_turn = limit;
-        if (pot_zero < pot_1_turn)
-          pot_zero = pot_1_turn + 10;
-        unlocked = false;
         dirty = true;
         print_usb_string("1 Turn value set" CRLF);
       }
+      unlocked = false;
     }
     break;
     case 't':
@@ -258,7 +251,6 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
 
       if (limit != pot_zero) {
         pot_zero = pot_setpoint;
-        unlocked = true;
         dirty = true;
         print_usb_string("Zero position set" CRLF);
       }
@@ -274,7 +266,7 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
                "pot 1 turn:  %d" CRLF
                "current pot: %d" CRLF
                "backlash:    %d" CRLF,
-               pot_max, pot_zero, pot_1_turn, pot_setpoint, get_backlash());
+               pot_min, pot_zero, pot_1_turn, pot_setpoint, get_backlash());
       print_usb_string(wbuf);
       break;
     case 'q':
@@ -288,7 +280,7 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
         } while (chr != 'Y' && chr != 'y' && chr != 'N' && chr != 'n');
         if (chr == 'Y' || chr == 'y') {
             print_usb_string(CRLF "Saving movement parameters" CRLF);
-          save_pot_parameters(pot_max, pot_zero, pot_1_turn);
+          save_pot_parameters(pot_min, pot_zero, pot_1_turn);
         }
       }
     default:
@@ -308,26 +300,30 @@ CLI_Command_Definition_t cmd_motor = {
     .cExpectedNumberOfParameters = 0,
 };
 
-// Go to the absolute pot position considering backlash
-void move_to_pot(unsigned int pot) {
-  // this is a CW motion so the pot must be offset by the backlash
-  if (pot == pot_setpoint) return;
-  if (pot < pot_setpoint) {
-    // turn CW
-    // If the CW backlash isn't taken up and the motion is less than backlash, don't move.
-    // The move would just reduce the backlash
-    if (!cw_backlash_taken) {
-      if ((pot_setpoint - pot) <= get_backlash() + 1)
-        return;
-    }
-    pot -= get_backlash();  // move extra for the backlash
+int angle_now() {
+  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
+
+  // from the current pot setpoint, where is the motor now in a range of [-180, 180)
+  unsigned pos = filtered_pot_word + (cw_backlash_taken ? get_backlash() : 0);
+  return ((int)(pos - pot_zero)*360)/(pot_min - pot_1_turn);
+}
+
+// Go to the absolute pot position considering backlash. The position is relative to
+// the pot position if moving in the CCW direction (all CCW backlash taken up)
+void move_to_pot(unsigned int pos) {
+  unsigned backlash = get_backlash();
+  unsigned pot = pos;
+
+  // this is the current position of the mechanism considering backlash
+  unsigned p0 = cw_backlash_taken ? pot_setpoint - backlash : pot_setpoint;
+  if (pos == p0) return;
+
+  if (pos > p0) {
+    // this is a CW motion so the pot must be offset by the backlash
+    pot += get_backlash();      // move extra for the backlash
     cw_backlash_taken = true;   // the move will take up the cw backlash
   } else {
     // turn CCW
-    if (cw_backlash_taken) {
-      if ((pot - pot_setpoint) <= get_backlash() + 1)
-        return;
-    }
     cw_backlash_taken = false;  // it is the ccw backlash that will be taken up
   }
   pot_setpoint = pot;
@@ -347,10 +343,10 @@ bool nudge_by_pot(unsigned int pot) {
     pot -= get_backlash();
 
   if (!unlocked) {
-    if (pot < pot_1_turn - 20)
-      tmp = pot_1_turn - 20;
-    else if (pot > pot_max)
-      tmp = pot_max;
+    if (pot > pot_1_turn + 20)
+      tmp = pot_1_turn + 20;
+    else if (pot < pot_min)
+      tmp = pot_min;
     else
       tmp = pot;
     limited = tmp != pot;
@@ -431,7 +427,7 @@ void init_motor() {
   LL_ADC_REG_StartConversion(ADC_MOTOR);
 
   // set the motor PID gains
-  motor_pid.Kp = 400 << 21;   // gain is in units of mV/pot LSB in Q32.16
+  motor_pid.Kp = 400u << 21u;   // gain is in units of mV/pot LSB in Q32.16
   motor_pid.Kd = 0;
   motor_pid.Ki = 0;
 
@@ -439,6 +435,7 @@ void init_motor() {
 
   FreeRTOS_CLIRegisterCommand(&cmd_motor);
 
+  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
 }
 
 

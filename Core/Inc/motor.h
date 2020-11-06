@@ -10,5 +10,6 @@
 void init_motor();
 void motor_isr();
 void move_to_angle(int angle);
+int angle_now();
 
 #endif //GEO_00001_MOTOR_H

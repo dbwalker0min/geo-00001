@@ -10,7 +10,7 @@
 
 #define MAJOR 0
 #define MINOR 0
-#define PATCH 1
+#define PATCH 2
 
 #define VERSION_STRING "v" V_STR(MAJOR) "." V_STR(MINOR) "." V_STR(PATCH)
 #endif //GEO_00001_VERSION_H

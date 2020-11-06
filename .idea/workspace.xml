@@ -15,7 +15,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4952da97-04ba-4a48-82bc-2219d32b79ad" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/Inc/version.h" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Inc/version.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,7 +109,7 @@
       <workItem from="1603390512467" duration="47516000" />
       <workItem from="1603841371061" duration="12431000" />
       <workItem from="1604102877597" duration="39291000" />
-      <workItem from="1604430865744" duration="2620000" />
+      <workItem from="1604430865744" duration="13499000" />
     </task>
     <task id="LOCAL-00001" summary="ADC coming along...">
       <created>1602365447852</created>
@@ -201,10 +201,10 @@
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
     <state x="4426" y="96" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1603408922646" />
-    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1604342470242">
+    <state x="4134" y="66" width="1156" height="767" key="find.popup" timestamp="1604695022474">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>
-    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604342470242" />
+    <state x="4134" y="66" width="1156" height="767" key="find.popup/3440.0.1920.1040/0.0.3440.1400@3440.0.1920.1040" timestamp="1604695022474" />
     <state x="4387" y="274" width="550" height="427" key="refactoring.ChangeSignatureDialog" timestamp="1603758796186">
       <screen x="3440" y="0" width="1920" height="1040" />
     </state>

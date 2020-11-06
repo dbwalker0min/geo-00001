@@ -70,7 +70,7 @@ CLI_Command_Definition_t cmd_mcal = {
     .pxCommandInterpreter = command_magcal,
     .pcCommand = "mcal",
     .pcHelpString = "mcal 0|1|on|off|show|cancel" CRLF " Start, stop, cancel, or show a magnetic calibration" CRLF CRLF,
-    .cExpectedNumberOfParameters = 1,
+    .cExpectedNumberOfParameters = 0,
 };
 
 void on_host_port_opened() {
