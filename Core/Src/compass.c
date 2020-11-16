@@ -70,7 +70,7 @@ CLI_Command_Definition_t cmd_mcal = {
     .pxCommandInterpreter = command_magcal,
     .pcCommand = "mcal",
     .pcHelpString = "mcal 0|1|on|off|show|cancel" CRLF " Start, stop, cancel, or show a magnetic calibration" CRLF CRLF,
-    .cExpectedNumberOfParameters = 0,
+    .cExpectedNumberOfParameters = 1,
 };
 
 void on_host_port_opened() {
@@ -133,9 +133,12 @@ __NO_RETURN void task_compass(void* arg)
       arm_biquad_cascade_df1_f32(&mag_y_filterdef, &y, &filtered_mag_y, 1);
 
       // compute the heading in degrees
-      hdg = atan2f(filtered_mag_y, -filtered_mag_x)*57.29577951f - 10.f;
+      float thdg = atan2f(-filtered_mag_y, filtered_mag_x)*57.29577951f - 10.f;
+      hdg = (thdg < -180.f) ? thdg + 360.f : thdg;
+
+      // put hdg in (-180, 180] so -hdg is in [-180, 180)
       if (!pause_loop && startup_delay == 0)
-        move_to_angle(-(int)hdg);
+        move_to_angle((int)(-hdg));
     } else {
       osDelay(1);
     }

@@ -30,7 +30,6 @@ static struct {
 
 static uint16_t pot_min;
 static uint16_t pot_1_turn;
-static uint16_t pot_zero;
 
 static arm_pid_instance_q31 motor_pid;
 static unsigned pot_setpoint;
@@ -56,6 +55,9 @@ static inline int iabs(int x)
 {
   return x < 0 ? -x : x;
 }
+
+static const uint16_t mech_pot_min = 4096*5/10;
+static const uint16_t mech_pot_max = 4096*7/10;
 
 // minimum input voltage in mV
 static float vin_min = 12.0f;
@@ -90,66 +92,69 @@ static const arm_biquad_casd_df1_inst_q31 pot_filter = {
 bool nudge_by_pot(unsigned int pot);
 void move_to_pot(unsigned int pos);
 
-void move_to_angle(int angle) {
-  int current_angle = angle_now();
 
-  // total movement
-  int motion = angle - current_angle;
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+// find the pot that corresponds to the angle in [-deg_overlap, 360]
+int angle_to_pot(int angle) {
+  uint16_t p_min = get_pot_min();
+  uint16_t p_1_turn = get_pot_1_turn();
 
-  while (motion > 180) {
-    motion -= 360;
-    angle -= 360;
-  }
-
-  while (motion < -180) {
-    motion += 360;
-    angle += 360;
-  }
-
-  // motion will now be less than +/-180
-  // get the pot value (ccw backlash taken up) value
-  int pot = angle_to_pot(angle);
-  if (pot == 1) {
-    angle += 360;
-    pot = angle_to_pot(angle);
-  }  else if (pot == -1) {
-    angle -= 360;
-    pot = angle_to_pot(angle);
-  }
-  SEGGER_RTT_printf(0, "Min motion %d, angle %d, pot %d" CRLF, motion, angle, pot);
-  move_to_pot(pot);
-  current_angle = angle;
+  unsigned pot = p_1_turn - ((p_1_turn - p_min) * angle) / 360;
+  return (int)pot;
 }
 
+void move_to_angle(int angle) {
+  // angle is in [-180, 180)
+  if (angle < 0)
+    angle += 360;
+  // angle is now in [0, 360)
+
+  // sometimes, there are two positions that are valid because the setpoint is [-deg_overlap, 360]
+  if (angle >= 360 - deg_overlap) {
+    // find the angle that minimizes the movement. Here, angle is in [360-deg_overlap, 360)
+    int current_angle = angle_now();    // current_angle in [-deg_overlap, 360]
+    int move1 = iabs(angle - current_angle);  // move1: [-deg_overlap, 360 + deg_overlap]
+    int move2 = iabs(angle - 360 - current_angle);  // move2: [-deg_overlap - 360, deg_overlap]
+
+    SEGGER_RTT_printf(0, "move1 %d, move2 %d" CRLF, move1, move2);
+    if (move2 < move1)
+      angle -= 360;
+  }
+
+  int pot = angle_to_pot(angle);
+  SEGGER_RTT_printf(0, "Angle %d, pot %d" CRLF, angle, pot);
+  move_to_pot(pot);
+}
+#pragma GCC pop_options
+
 static const char nudge_prompt[] =
-    "Motor nudge mode" CRLF
-    "a = CCW ~1deg s = CW ~1deg" CRLF
-    "A = CCW ~5deg S = CW ~5deg" CRLF
-    "< = CCW ~90deg > = CW ~90deg" CRLF
-    "u - unlock max CCW rotation limit (dangerous!)" CRLF
-    "L - set CCW rotation limit" CRLF
+    "Mechanism setup mode" CRLF
+    "a = CCW  1 deg; s = CW  1 deg" CRLF
+    "A = CCW 25 deg; S = CW 25 deg" CRLF
+    "< = CCW 90 deg; > = CW 90 deg" CRLF
+    "u - unlock rotation limits (dangerous!)" CRLF
+    "L - set CW rotation limit (index position)" CRLF
     "l - go to CCW rotation limit" CRLF
-    "T - set 360deg from limit" CRLF
-    "t - go to 360deg from limit" CRLF
-    "Z - set zero position" CRLF
-    "z - go to zero position" CRLF
-    "? - print calibration positions" CRLF
+    "T - set 360 deg CCW from limit" CRLF
+    "t - go to 360 deg from limit" CRLF
+    "? - print settings (pot units)" CRLF
     "b - set mechanism backlash" CRLF
     "h Print this help" CRLF
-    "q quit (saving changes)" CRLF;
+    "q quit" CRLF;
 
 BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
   char ch;
   bool done = false;
   bool dirty = false;
 
-  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
+  get_pot_params(&pot_min, &pot_1_turn);
 
   // it is where it is
   pot_setpoint = filtered_pot_word;
   static char printf_buf[80];
 
-  print_usb_string(nudge_prompt);
+  write_usb(nudge_prompt, sizeof(nudge_prompt));
 
   while (!done) {
     ch = get_usb_char();
@@ -161,18 +166,18 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
       nudge_by_pot(pot_setpoint - 2);
       break;
     case 'A':
-      nudge_by_pot(pot_setpoint + 9);
+      nudge_by_pot(pot_setpoint + (int)POT_FROM_ANGLE(25));
       break;
     case 'S':
-      nudge_by_pot(pot_setpoint - 9);
+      nudge_by_pot(pot_setpoint - (int)POT_FROM_ANGLE(25));
       break;
     case ',':
     case '<':
-      nudge_by_pot(pot_setpoint + 153);
+      nudge_by_pot(pot_setpoint + (int)POT_FROM_ANGLE(90));
       break;
     case '.':
     case '>':
-      nudge_by_pot(pot_setpoint - 153);
+      nudge_by_pot(pot_setpoint - (int)POT_FROM_ANGLE(90));
       break;
     case 'h' :
       print_usb_string(nudge_prompt);
@@ -243,30 +248,13 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
     case 't':
       move_to_pot(pot_1_turn);
       break;
-    case 'Z': {
-      unsigned limit = pot_setpoint;
-
-      if (cw_backlash_taken)
-        limit += get_backlash();
-
-      if (limit != pot_zero) {
-        pot_zero = pot_setpoint;
-        dirty = true;
-        print_usb_string("Zero position set" CRLF);
-      }
-    }
-    break;
-    case 'z':
-      move_to_pot(pot_zero);
-      break;
     case '?':
       snprintf(wbuf, buf_len,
-               "pot limit:   %d" CRLF
-               "pot zero:    %d" CRLF
-               "pot 1 turn:  %d" CRLF
-               "current pot: %d" CRLF
+               "pot limit:   %d Ohms" CRLF
+               "pot 1 turn:  %d Ohms" CRLF
+               "current pot: %d Ohms" CRLF
                "backlash:    %d" CRLF,
-               pot_min, pot_zero, pot_1_turn, pot_setpoint, get_backlash());
+               10000*pot_min/4096, 10000*pot_1_turn/4096, 10000*pot_setpoint/4096, get_backlash());
       print_usb_string(wbuf);
       break;
     case 'q':
@@ -280,7 +268,7 @@ BaseType_t command_motor(char *wbuf, size_t buf_len, const char *cmd) {
         } while (chr != 'Y' && chr != 'y' && chr != 'N' && chr != 'n');
         if (chr == 'Y' || chr == 'y') {
             print_usb_string(CRLF "Saving movement parameters" CRLF);
-          save_pot_parameters(pot_min, pot_zero, pot_1_turn);
+          save_pot_parameters(pot_min, pot_1_turn);
         }
       }
     default:
@@ -300,12 +288,12 @@ CLI_Command_Definition_t cmd_motor = {
     .cExpectedNumberOfParameters = 0,
 };
 
+// from the current pot setpoint, where is the mechanism now in a range of [-deg_overlap, 360]
 int angle_now() {
-  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
-
-  // from the current pot setpoint, where is the motor now in a range of [-180, 180)
+  // remove the backlash
   unsigned pos = filtered_pot_word + (cw_backlash_taken ? get_backlash() : 0);
-  return ((int)(pos - pot_zero)*360)/(pot_min - pot_1_turn);
+
+  return ((int)(get_pot_1_turn() - pos)*360)/(get_pot_1_turn() - get_pot_min());
 }
 
 // Go to the absolute pot position considering backlash. The position is relative to
@@ -343,10 +331,10 @@ bool nudge_by_pot(unsigned int pot) {
     pot -= get_backlash();
 
   if (!unlocked) {
-    if (pot > pot_1_turn + 20)
-      tmp = pot_1_turn + 20;
-    else if (pot < pot_min)
-      tmp = pot_min;
+    if (pot > mech_pot_max)
+      tmp = mech_pot_max;
+    else if (pot < mech_pot_min)
+      tmp = mech_pot_min;
     else
       tmp = pot;
     limited = tmp != pot;
@@ -388,13 +376,9 @@ static void set_motor_v(int voltage_mv) {
   }
 }
 
-static uint8_t rtt_buffer[2048];
-
 void init_motor() {
-
   LL_ADC_DisableDeepPowerDown(ADC_MOTOR);
 
-  SEGGER_RTT_ConfigUpBuffer(1, "JScope_u2", rtt_buffer, 2048, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
   // wait 20us for ADC power on
   for (int i=0; i<16*20; i++)
     __NOP();
@@ -435,7 +419,7 @@ void init_motor() {
 
   FreeRTOS_CLIRegisterCommand(&cmd_motor);
 
-  get_pot_params(&pot_min, &pot_zero, &pot_1_turn);
+  get_pot_params(&pot_min, &pot_1_turn);
 }
 
 
